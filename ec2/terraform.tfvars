@@ -9,3 +9,4 @@ InstanceType   = "t2.micro"
 ami-Id         = "ami-051f7e7f6c2f40dc1"
 key_name       = "terra"
 instance_count = 3
+security_sg_name = "My-Instance-SG"
