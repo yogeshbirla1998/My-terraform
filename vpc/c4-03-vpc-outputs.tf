@@ -6,6 +6,10 @@ output "vpc_id" {
   value       = module.vpc.vpc_id
 }
 
+output "default_security_group_id"{
+
+value =  module.vpc.default_security_group_id
+}
 # VPC CIDR blocks
 output "vpc_cidr_block" {
   description = "The CIDR block of the VPC"

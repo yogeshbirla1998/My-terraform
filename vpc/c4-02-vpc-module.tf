@@ -1,3 +1,4 @@
+
 # Create VPC Terraform Module
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
@@ -10,7 +11,9 @@ module "vpc" {
   azs             = var.vpc_availability_zones
   public_subnets  = var.vpc_public_subnets
   private_subnets = var.vpc_private_subnets
-
+  default_security_group_egress = []
+  default_security_group_ingress = [] 
+  default_security_group_name = "${local.name}-${var.vpc_name}-sg"
 
   # NAT Gateways - Outbound Communication
   enable_nat_gateway = var.vpc_enable_nat_gateway
