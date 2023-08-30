@@ -9,3 +9,4 @@ variable "storage_size" {}
 variable "key_name" {}
 variable "ami-Id" {}
 variable "instance_count" {}
+variable "security_sg_name" {}
