@@ -29,7 +29,7 @@ resource "aws_instance" "priv_instance" {
   user_data  = file("./myscript.sh")
   
   tags = {
-    Name   = "instance-${count.index + 1}"
+    Name   = "${var.Name}-${count.index + 1}"
     Owner  = var.Owner
     mailID = var.mailID
   }
@@ -53,7 +53,7 @@ resource "aws_instance" "public_instance" {
   user_data  = file("./myscript.sh")
   
   tags = {
-    Name   = "instance-jump-box"
+    Name   = "${var.Name}-Jump-Box"
     Owner  = var.Owner
     mailID = var.mailID
   }
