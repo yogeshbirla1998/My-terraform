@@ -18,7 +18,7 @@ data "terraform_remote_state" "vpc" {
     volume_size = var.storage_size
   }
   
-  ami                         = var.ami-Id
+  ami                         = var.amiId
   instance_type               = var.InstanceType
   associate_public_ip_address = false
   

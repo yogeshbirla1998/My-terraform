@@ -18,7 +18,7 @@ resource "aws_instance" "priv_instance" {
     volume_size = var.storage_size
   }
   
-  ami                         = var.ami-Id
+  ami                         = var.amiId
   instance_type               = var.InstanceType
   associate_public_ip_address = false
   
