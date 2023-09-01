@@ -3,9 +3,11 @@ provider "aws" {
 }
 
 data "terraform_remote_state" "vpc" {
-  backend = "local"
+  backend = "s3"
   config = {
-    path = "../vpc/terraform.tfstate"
+    bucket = "petfstate"
+    key    = "platform_Enginnering/VPC/terraform.tfstate"
+    region = "us-east-1"
   }
 }
 
