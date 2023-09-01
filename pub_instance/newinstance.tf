@@ -11,7 +11,7 @@ data "terraform_remote_state" "vpc" {
 
 #private instance creation
 
-resource "aws_instance" "priv_instance" {
+/* resource "aws_instance" "priv_instance" {
   count = var.instance_count
   
   root_block_device {
@@ -33,7 +33,7 @@ resource "aws_instance" "priv_instance" {
     Owner  = var.Owner
     mailID = var.mailID
   }
-}
+} */
 
 
 #Public Instance for Jump-Box Creation
