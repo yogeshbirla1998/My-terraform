@@ -5,7 +5,7 @@ provider "aws" {
 data "terraform_remote_state" "vpc" {
   backend = "s3"
   config = {
-    bucket = "petfstate"
+    bucket = "pe2dev"
     key    = "platform_Enginnering/VPC/terraform.tfstate"
     region = "us-east-1"
   }
