@@ -47,7 +47,6 @@ resource "aws_security_group_rule" "inbound_rules" {
 
 # Outbound rules (egress)
 resource "aws_security_group_rule" "egress_rules" {
-    count = 6  # Number of egress rules
     type        = "egress" 
     from_port   = 0
     to_port     = 0
