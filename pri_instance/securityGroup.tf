@@ -27,23 +27,32 @@
    }
 } */
 
-resource "aws_security_group" "security_sg" {
-    description = "Allow HTTPS to web server"  # Replace with your description
+
+resource "aws_security_group" "security_sg"  {
+    name        = "example-sg"
+    description = "Kubernetes Security Group"
     vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
-  
-    ingress {
-      description = "Kubernetes inbound ports"
-      from_port   = [6443, 2379, 10250, 10259, 10257, 30000]
-      to_port     = [6443, 2380, 10250, 10259, 10257, 32767]
-      protocol    = "tcp"
-      cidr_blocks = [data.terraform_remote_state.vpc.outputs.vpc_cidr_block]
-    }
-  
-    egress {
-      from_port   = 0
-      to_port     = 0
-      protocol    = "-1"
-      cidr_blocks = ["0.0.0.0/0"]
-    }
-  }
-  
+}
+
+# Inbound rules
+resource "aws_security_group_rule" "inbound_rules" {
+    count = 6  
+    type        = "ingress"
+    from_port   = element([6443, 2379, 10250, 10259, 10257, 30000], count.index)
+    to_port     = element([6443, 2380, 10250, 10259, 10257, 32767], count.index)
+    protocol    = "tcp"
+    cidr_blocks = [data.terraform_remote_state.vpc.outputs.vpc_cidr_block]
+    security_group_id = aws_security_group.security_sg.id
+}
+
+# Outbound rules (egress)
+resource "aws_security_group_rule" "egress_rules" {
+    count = 6  # Number of egress rules
+    type        = "egress" 
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    security_group_id = aws_security_group.security_sg.id
+}
+
