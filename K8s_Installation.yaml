@@ -147,6 +147,3 @@
       shell: kubectl get nodes
       register: nodes
 
-    - name: Display Nodes status
-      debug:
-        var: nodes
