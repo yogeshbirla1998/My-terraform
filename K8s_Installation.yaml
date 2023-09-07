@@ -124,8 +124,14 @@
       delegate_to: master
       shell: |
         kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
-
-
+    - name: Wait for Kubernetes nodes to be ready
+      wait_for:
+        timeout: 250
+        delay: 10
+        host: "{{ item }}"
+        port: 6443
+      with_items: "{{ groups['master'] }}"
+      when: inventory_hostname in groups['worker']
 
     - name: Get pods data
       delegate_to: master
