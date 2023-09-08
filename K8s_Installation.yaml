@@ -1,4 +1,4 @@
-I---
+---
 - name: Install k8s on cluster nodes
   hosts: master, worker
   tasks:
