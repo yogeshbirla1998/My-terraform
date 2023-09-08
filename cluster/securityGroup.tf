@@ -29,7 +29,7 @@
 
 
 resource "aws_security_group" "security_sg"  {
-    name        = "example-sg"
+    name        = "Cluster_SG"
     description = "Kubernetes Security Group"
     vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
 }
