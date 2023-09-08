@@ -1,4 +1,4 @@
----
+I---
 - name: Install k8s on cluster nodes
   hosts: master, worker
   tasks:
@@ -126,7 +126,7 @@
         kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
     - name: Wait for Kubernetes nodes to be ready
       wait_for:
-        timeout: 250
+        timeout: 300
         delay: 10
         host: "{{ item }}"
         port: 6443
