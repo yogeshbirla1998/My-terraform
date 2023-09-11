@@ -126,7 +126,8 @@
         {% if cni_choice == 'flannel' %}
           kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
         {% elif cni_choice == 'calico' %}
-          kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+          curl https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml -O
+          kubectl apply -f calico.yaml
         {% elif cni_choice == 'multus' %}
           kubectl apply -f https://github.com/intel/multus-cni/blob/master/images/multus-daemonset.yml
         {% else %}
