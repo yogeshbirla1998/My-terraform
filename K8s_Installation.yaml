@@ -123,8 +123,16 @@
     - name: Get kube flannel pods
       delegate_to: master
       shell: |
-        kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
-  
+        {% if cni_choice == 'flannel' %}
+          kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+        {% elif cni_choice == 'calico' %}
+          kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+        {% elif cni_choice == 'multus' %}
+          kubectl apply -f https://github.com/intel/multus-cni/blob/master/images/multus-daemonset.yml
+        {% else %}
+          echo "Invalid CNI choice: {{ cni_choice }}"
+          exit 1
+        {% endif %}
 
     - name: Get pods data
       delegate_to: master
