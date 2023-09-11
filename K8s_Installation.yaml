@@ -85,7 +85,7 @@
 
     - name: K8s init
       delegate_to: master
-      shell: sudo kubeadm init --pod-network-cidr=10.244.0.0/16
+      shell: sudo kubeadm init --pod-network-cidr=192.168.0.0/16
       register: output
 
     - name: Create .kube directory
