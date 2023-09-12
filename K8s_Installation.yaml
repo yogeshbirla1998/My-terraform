@@ -93,6 +93,7 @@
       shell: |
         mkdir -p $HOME/.kube
         sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
+        sudo cp /etc/kubernetes/admin.conf $HOME/kubeconfig.yaml
         sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
     - name: Deploy a pod network
@@ -155,7 +156,7 @@
     - name: Copy Kubernetes Config from Master
       become: yes  # Run this task with elevated privileges
       fetch:
-        src: $HOME/.kube/config # Specify the remote path to the kubeconfig file
+        src: $HOME/kubeconfig.yaml # Specify the remote path to the kubeconfig file
         dest: ./kubeconfig.yaml  # Specify the local destination path
         flat: yes
 
