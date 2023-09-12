@@ -150,25 +150,12 @@
       shell: kubectl get nodes
       register: nodes
       
-- name: Get Kubernetes Config
-  hosts: master
-  gather_facts: no
-  tasks:
     - name: Copy Kubernetes Config from Master
-      become: yes  # Run this task with elevated privileges
+      delegate_to: master
       fetch:
         src: $HOME/kubeconfig.yaml # Specify the remote path to the kubeconfig file
         dest: ./kubeconfig.yaml  # Specify the local destination path
         flat: yes
-
-    - name: Read Kubernetes Config
-      slurp:
-        src: ./kubeconfig.yaml
-      register: kubeconfig_contents
-
-    - name: Print Kubernetes Config
-      debug:
-        var: kubeconfig_contents.content | b64decode
 
 
     
