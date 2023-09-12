@@ -124,14 +124,14 @@
       delegate_to: master
       shell: |
         {% if cni_choice == 'flannel' %}
-          kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+          kubectl apply --ignore-existing -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
         {% elif cni_choice == 'calico' %}
-          kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml
+          kubectl apply --ignore-existing -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml
         {% elif cni_choice == 'multus' %}
-          kubectl apply -f https://github.com/intel/multus-cni/blob/master/images/multus-daemonset.yml
+          kubectl apply --ignore-existing -f https://github.com/intel/multus-cni/blob/master/images/multus-daemonset.yml
         {% else %}
           echo "Invalid CNI choice: {{ cni_choice }}, installing flannel as default CNI"
-          kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+          kubectl apply --ignore-existing -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
         {% endif %}
 
     - name: Get pods data
