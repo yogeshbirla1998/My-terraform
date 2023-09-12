@@ -154,7 +154,7 @@
   tasks:
     - name: Copy Kubernetes Config from Master
       fetch:
-        src: /etc/kubernetes/admin.conf  # Specify the remote path to the kubeconfig file
+        src: $HOME/.kube/config # Specify the remote path to the kubeconfig file
         dest: ./kubeconfig.yaml    # Specify the local destination path
         flat: yes
 
