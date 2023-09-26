@@ -20,7 +20,7 @@
 
     - name: Send instance information with CURL
       uri:
-        url: http://10.63.35.134:8000/insertInstanceDetails/
+        url: http://10.63.35.244:8080/platform/v1/Database/insertInstance
         method: POST
         body_format: json
         body: '{"instance_name": "{{ item.instance_name }}", "instance_ip": "{{ item.instance_ip }}", "deployment_type": "{{ item.deployment_type }}", "current_state": "{{ item.current_state }}", "instance_type": "{{ item.instance_type }}" }'
