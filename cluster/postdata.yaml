@@ -26,7 +26,7 @@
         body_format: json
         body: '{"instance_id": "{{ item.instance_id }}", "instance_name": "{{ item.instance_name }}", "instance_ip": "{{ item.instance_ip }}", "deployment_type": "{{ item.deployment_type }}", "current_state": "{{ item.current_state }}", "instance_type": "{{ item.instance_type }}" }'
         status_code: 200  # Adjust this as needed
-      with_items: "{{ instances_data }}
+      with_items: "{{ instances_data }}"
 
 
 
