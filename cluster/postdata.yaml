@@ -1,5 +1,7 @@
 - name: Store IPs with CURL
   hosts: localhost
+  vars: 
+    storage_size: "{{ storage_size }}"
   gather_facts: yes
   tasks:
     - name: Gather instance information
@@ -24,7 +26,7 @@
         url: http://10.63.35.244:8080/platform/v1/Database/insertInstance
         method: POST
         body_format: json
-        body: '{"instance_id": "{{ item.instance_id }}", "instance_name": "{{ item.instance_name }}", "instance_ip": "{{ item.instance_ip }}", "deployment_type": "{{ item.deployment_type }}", "current_state": "{{ item.current_state }}", "instance_type": "{{ item.instance_type }}" }'
+        body: '{"instance_id": "{{ item.instance_id }}", "instance_name": "{{ item.instance_name }}", "instance_ip": "{{ item.instance_ip }}", "deployment_type": "{{ item.deployment_type }}", "current_state": "{{ item.current_state }}", "instance_type": "{{ item.instance_type }}", "instance_volume": "{{ storage_size }}" }'
         status_code: 200  # Adjust this as needed
       with_items: "{{ instances_data }}"
 
