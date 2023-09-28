@@ -64,12 +64,12 @@
       apt:
         name: kubernetes-cni
         state: present
-    - name: Reset old files
+    - name: Remove existing Kubernetes files
       become: true
       shell: |
-      sudo kubeadm reset -f
-      sudo rm -rf /etc/kubernetes
-
+        sudo kubeadm reset -f && sudo rm -rf /etc/kubernetes
+      ignore_errors: yes  # Ignore errors if the files do not exist
+  
     - name: Disabling swap memory
       shell: sudo swapoff -a
 
@@ -108,7 +108,11 @@
       delegate_to: master
       shell: kubeadm token create --print-join-command
       register: output
-
+      
+    - name: Remove existing Kubernetes files
+      shell: sudo rm -f /etc/kubernetes/bootstrap-kubelet.conf /etc/kubernetes/pki/ca.crt
+      ignore_errors: yes  # Ignore errors if the files do not exist
+  
     - name: set join command
       delegate_to: master
       set_fact:
