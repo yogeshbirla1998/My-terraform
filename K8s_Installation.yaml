@@ -150,12 +150,12 @@
       shell: kubectl get nodes
       register: nodes
       
-    - name: Copy Kubernetes Config from Master
-      delegate_to: master
-      fetch:
-        src: $HOME/kubeconfig.yaml # Specify the remote path to the kubeconfig file
-        dest: ./kubeconfig.yaml  # Specify the local destination path
-        flat: yes
+ #   - name: Copy Kubernetes Config from Master
+ #     delegate_to: master
+ #     fetch:
+ #       src: $HOME/kubeconfig.yaml # Specify the remote path to the kubeconfig file
+ #       dest: ./kubeconfig.yaml  # Specify the local destination path
+ #       flat: yes
 
 
     
