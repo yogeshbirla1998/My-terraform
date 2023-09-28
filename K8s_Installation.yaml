@@ -124,11 +124,16 @@
       debug:
         msg: "{{ join_command }}"
 
+#    - name: join worker to master
+#      shell: sudo {{ join_command }}
+#      delegate_to: "{{ item }}"
+#      loop: "{{ groups['worker'] }}"
+      
     - name: join worker to master
-      shell: sudo {{ join_command }}
+      shell: sudo {{ join_command }} --ignore-preflight-errors=FileAvailable,Port-10250
       delegate_to: "{{ item }}"
       loop: "{{ groups['worker'] }}"
-
+  
     - name: Get kube flannel pods
       delegate_to: master
       shell: |
