@@ -141,14 +141,14 @@
       shell: kubectl get pods --all-namespaces
       register: pods
 
-    - name: Display pods status
-      debug:
-        var: pods
+#    - name: Display pods status
+#      debug:
+#        var: pods
 
-    - name: Get Nodes Data
-      delegate_to: master
-      shell: kubectl get nodes
-      register: nodes
+#    - name: Get Nodes Data
+#      delegate_to: master
+#      shell: kubectl get nodes
+#      register: nodes
       
  #   - name: Copy Kubernetes Config from Master
  #     delegate_to: master
