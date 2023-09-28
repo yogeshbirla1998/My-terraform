@@ -123,6 +123,7 @@
       delegate_to: master
       shell: |
         kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+      ignore_errors: yes
   
 
     - name: Get pods data
