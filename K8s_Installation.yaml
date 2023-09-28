@@ -93,8 +93,10 @@
       shell: |
         mkdir -p $HOME/.kube
         sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
+        sudo cp /etc/kubernetes/admin.conf $HOME/kubeconfig.yaml
+        sudo chmod 777 $HOME/kubeconfig.yaml
         sudo chown $(id -u):$(id -g) $HOME/.kube/config
-
+        
     - name: Deploy a pod network
       delegate_to: master
       shell: |
