@@ -64,13 +64,10 @@
       apt:
         name: kubernetes-cni
         state: present
-    - name: Remove existing Kubernetes files
+    - name: Reset old files
       become: true
-      shell: |
-        yes | sudo kubeadm reset -f
-        sudo rm -rf /etc/kubernetes /var/lib/kubelet /var/lib/etcd /etc/cni/net.d
-      ignore_errors: yes  # Ignore errors if the files do not exist
-  
+      shell: kubeadm reset -f
+
     - name: Disabling swap memory
       shell: sudo swapoff -a
 
@@ -87,17 +84,15 @@
         sudo systemctl restart docker
 
     - name: K8s init
-      delegate_to: master
-      shell: sudo kubeadm init --pod-network-cidr=192.168.0.0/16
+      shell: sudo kubeadm init --pod-network-cidr=10.244.0.0/16
       register: output
+      when: inventory_hostname in ['master']
 
     - name: Create .kube directory
       delegate_to: master
       shell: |
         mkdir -p $HOME/.kube
         sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
-        sudo cp /etc/kubernetes/admin.conf $HOME/kubeconfig.yaml
-        sudo chmod 777 $HOME/kubeconfig.yaml
         sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
     - name: Deploy a pod network
@@ -109,11 +104,7 @@
       delegate_to: master
       shell: kubeadm token create --print-join-command
       register: output
-      
-    - name: Remove existing Kubernetes files
-      shell: sudo rm -f /etc/kubernetes/bootstrap-kubelet.conf /etc/kubernetes/pki/ca.crt
-      ignore_errors: yes  # Ignore errors if the files do not exist
-  
+
     - name: set join command
       delegate_to: master
       set_fact:
@@ -124,29 +115,15 @@
       debug:
         msg: "{{ join_command }}"
 
-#    - name: join worker to master
-#      shell: sudo {{ join_command }}
-#      delegate_to: "{{ item }}"
-#      loop: "{{ groups['worker'] }}"
-      
     - name: join worker to master
-      shell: sudo {{ join_command }} --ignore-preflight-errors=FileAvailable,Port-10250
-      delegate_to: "{{ item }}"
-      loop: "{{ groups['worker'] }}"
-  
+      become: true
+      shell: "{{ join_command }}"
+      when: inventory_hostname in groups['worker']
     - name: Get kube flannel pods
       delegate_to: master
       shell: |
-        {% if cni_choice == 'flannel' %}
-          kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml || true
-        {% elif cni_choice == 'calico' %}
-          kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml || true
-        {% elif cni_choice == 'multus' %}
-          kubectl apply -f https://github.com/intel/multus-cni/blob/master/images/multus-daemonset.yml || true
-        {% else %}
-          echo "Invalid CNI choice: {{ cni_choice }}, installing flannel as default CNI"
-          kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml || true
-        {% endif %}
+        kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+  
 
     - name: Get pods data
       delegate_to: master
