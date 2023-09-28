@@ -67,7 +67,7 @@
     - name: Remove existing Kubernetes files
       become: true
       shell: |
-        sudo kubeadm reset -f && sudo rm -rf /etc/kubernetes
+        sudo kubeadm reset -f -y && sudo rm -rf /etc/kubernetes
       ignore_errors: yes  # Ignore errors if the files do not exist
   
     - name: Disabling swap memory
