@@ -28,7 +28,7 @@
 
     - name: Deploy PostgreSQL Helm Chart
       command: |
-        helm upgrade --install {{ helm_release_name }} {{ helm_chart_name }} \
+        helm install {{ helm_release_name }} {{ helm_chart_name }} \
           -- set global.postgresql.auth.postgresPassword={{ postgres_admin_password }} \
           --set  global.postgresql.auth.username={{ postgres_username }} \
           --set  global.postgresql.auth.password={{ postgres_password }} \
