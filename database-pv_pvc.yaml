@@ -3,29 +3,28 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: postgresql-pv
-  labels:
-    type: local
+  name: RELEASE_NAME-pv
 spec:
-  storageClassName: "{{ storageClass }}"
+  storageClassName: STORAGE_CLASS
   capacity:
-    storage: "{{ size }}"
+    storage: SIZE
   accessModes:
-    - ReadWriteOnce
+    - ACCESS_MODE
   hostPath:
-    path: "/mnt/data"
+    path: HOST_PATH
     
 ---
 
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: postgresql-pv-claim
+  name: RELEASE_NAME-pvc
+  namespace: RELEASE_NAMESPACE
 spec:
-  storageClassName: "{{ storageClass }}"
+  storageClassName: STORAGE_CLASS
   accessModes:
-    - ReadWriteOnce
+    - ACCESS_MODE
   resources:
     requests:
-      storage: "{{ size }}"
+      storage: SIZE
 
