@@ -39,6 +39,7 @@
         --set global.postgresql.auth.database={{ postgres_db_name }}
         --set readReplicas.replicaCount={{ number_of_replicas }}
         --set primary.persistence.mountPath={{ local_directory_path }}
+        --set primary.persistence.storageClass=local-hostpath-storage
         --set primary.persistence.size=2Gi
         --set volumePermissions.enabled=true
         --set primary.service.type=NodePort
