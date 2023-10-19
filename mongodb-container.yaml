@@ -10,7 +10,7 @@
     mongodb_password: pass1
     mongodb_admin_password: Admin@123
     number_of_replicas: 2
-    local_directory_path: /bitnami/mongodb/Tools_intallation_container/
+    local_directory_path: "\/bitnami\/mongodb\/Tools_intallation_container"
     size: 2Gi
     storageClass: local-hostpath-storage
     accessMode: ReadWriteOnce
