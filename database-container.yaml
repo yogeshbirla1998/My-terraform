@@ -38,8 +38,8 @@
         --set global.postgresql.auth.password={{ postgres_password }}
         --set global.postgresql.auth.database={{ postgres_db_name }}
         --set readReplicas.replicaCount={{ number_of_replicas }}
-        --set primary.persistence.existingClaim={{ helm_release_name }}-data
         --set primary.persistence.mountPath={{ local_directory_path }}
+        --set primary.persistence.size=2Gi
         --set volumePermissions.enabled=true
         --set primary.service.type=NodePort
         --set primary.service.nodePorts.postgresql=32009
