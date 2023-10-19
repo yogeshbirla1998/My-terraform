@@ -32,9 +32,14 @@
       ignore_errors: yes
 
     - name: Apply the PV & PVC
-      ansible.builtin.command: kubectl apply -f database-pv_pvc.yaml
-      args:
-        executable: /bin/bash
+      command: >
+        # Perform variable substitution
+        sed -i "s/{{ storageClass }}/$storageClass/g" database-pv_pvc.yaml
+        sed -i "s/{{ size }}/$size/g" database-pv_pvc.yaml
+        
+        # Apply the PV & PVC using kubectl
+        kubectl apply -f database-pv_pvc.yaml
+      register: pv_pvc_install
 
     - name: Deploy PostgreSQL Helm Chart
       command: >
@@ -50,6 +55,7 @@
         --set volumePermissions.enabled=true
         --set primary.service.type=NodePort
         --set primary.service.nodePorts.postgresql=32009
+      when: pv_pvc_install.rc == 0
       register: helm_install
 
     - name: Wait for all pods to be in a 'Running' state
