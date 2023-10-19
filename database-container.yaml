@@ -14,6 +14,8 @@
     size: 2Gi
     storageClass: local-hostpath-storage
     accessMode: ReadWriteOnce
+    deployment_namespace: testing
+
   tasks:
     - name: Check if Helm is installed
       command: helm version --short
@@ -32,20 +34,13 @@
       command: helm uninstall {{ helm_release_name }} -n {{ helm_release_namespace }}
       ignore_errors: yes
 
-    - name: create PV & PVC file
-      command: >
-        sed -e "s/{{ helm_release_name }}/{{ RELEASE_NAME }}/g" \
-            -e "s/{{ storageClass }}/{{ STORAGE_CLASS }}/g" \
-            -e "s/{{ size }}/{{ SIZE }}/g" \
-            -e "s/{{ accessMode }}/{{ ACCESS_MODE }}/g" \
-            -e "s/{{ local_directory_path }}/{{ HOST_PATH }}/g" \
-            -e "s/{{ helm_release_namespace }}/{{ RELEASE_NAMESPACE }}/g" database-pv_pvc.yaml > pv-pvc.yaml
+    - name: Create PV & PVC file
+      command: "sed -e 's/RELEASE_NAME/{{ helm_release_name }}/g' -e 's/STORAGE_CLASS/{{ storageClass }}/g' -e 's/SIZE/{{ size }}/g' -e 's/ACCESS_MODE/{{ accessMode }}/g' -e 's|HOST_PATH|{{ local_directory_path }}|g' -e 's/RELEASE_NAMESPACE/{{ helm_release_namespace }}/g' database-pv_pvc.yaml > pv-pvc.yaml"
 
-        
-    -  name: create PV & PVC
-       command: kubectl apply -f pv-pvc.yaml
-       register: pv_pvc_install
-       
+    - name: Create PV & PVC
+      command: kubectl apply -f pv-pvc.yaml
+      register: pv_pvc_install
+
     - name: Deploy PostgreSQL Helm Chart
       command: >
         helm install {{ helm_release_name }} {{ helm_chart_name }} -n {{ helm_release_namespace }}
@@ -77,4 +72,3 @@
       command: kubectl get svc -n {{ deployment_namespace }} {{ helm_release_name }}-postgresql -o=json
       register: nodeport_details
       when: helm_install.rc == 0
-
