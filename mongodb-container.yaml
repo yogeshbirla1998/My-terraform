@@ -45,7 +45,7 @@
       command: kubectl apply -f pv-pvc.yaml
       register: pv_pvc_install
 
-    - name: Deploy PostgreSQL Helm Chart
+    - name: Deploy Mongodb Helm Chart
       command: >
         helm install {{ helm_release_name }} {{ helm_chart_name }} -n {{ helm_release_namespace }}
         --set auth.rootPassword={{ mongodb_admin_password }}
