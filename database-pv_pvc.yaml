@@ -11,7 +11,7 @@ spec:
   accessModes:
     - ACCESS_MODE
   hostPath:
-    path: /bitnami/mongodb/Tools_intallation_container/
+    path: /bitnami/DATABASE/Tools_intallation_container/
     
 ---
 
