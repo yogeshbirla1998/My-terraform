@@ -1,6 +1,6 @@
 ---
 - name: Deploy PostgreSQL Helm Chart
-  hosts: your_target_host
+  hosts: localhost
   become: yes
   vars:
     helm_chart_name: bitnami/postgresql
