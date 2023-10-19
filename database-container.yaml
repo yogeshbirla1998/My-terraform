@@ -1,7 +1,6 @@
 ---
 - name: Deploy PostgreSQL Helm Chart
   hosts: localhost
-  become: yes
   vars:
     helm_chart_name: bitnami/postgresql
     helm_release_name: postgres-testing
@@ -27,27 +26,26 @@
       ignore_errors: yes
 
     - name: Deploy PostgreSQL Helm Chart
-      command: |
-        helm install {{ helm_release_name }} {{ helm_chart_name }} \
-          -- set global.postgresql.auth.postgresPassword={{ postgres_admin_password }} \
-          --set  global.postgresql.auth.username={{ postgres_username }} \
-          --set  global.postgresql.auth.password={{ postgres_password }} \
-          --set global.postgresql.auth.database={{ postgres_db_name }} \
-          --set readReplicas.replicaCount={{ number_of_replicas }} \
-          --set primary.persistence.existingClaim={{ helm_release_name }}-data \
-          --set primary.persistence.mountPath={{ local_directory_path }} \
-          --set volumePermissions.enabled=true
+      command: >
+        helm install {{ helm_release_name }} {{ helm_chart_name }}
+        --set global.postgresql.auth.postgresPassword={{ postgres_admin_password }}
+        --set global.postgresql.auth.username={{ postgres_username }}
+        --set global.postgresql.auth.password={{ postgres_password }}
+        --set global.postgresql.auth.database={{ postgres_db_name }}
+        --set readReplicas.replicaCount={{ number_of_replicas }}
+        --set primary.persistence.existingClaim={{ helm_release_name }}-data
+        --set primary.persistence.mountPath={{ local_directory_path }}
+        --set volumePermissions.enabled=true
       register: helm_install
 
     - name: Create a NodePort service for PostgreSQL
-      command: |
-        kubectl expose deployment {{ helm_release_name }} \
-          --type=NodePort \
-          --name={{ helm_release_name }}-svc
+      command: >
+        kubectl expose deployment {{ helm_release_name }}
+        --type=NodePort
+        --name={{ helm_release_name }}-svc
       when: helm_install.rc == 0
 
 - name: PostgreSQL Helm Chart Deployment Complete
-  hosts: your_target_host
   tasks:
     - name: Print NodePort service details
       command: kubectl get svc {{ helm_release_name }}-svc -o=json
