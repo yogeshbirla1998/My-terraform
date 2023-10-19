@@ -35,7 +35,7 @@
       ignore_errors: yes
 
     - name: Create PV & PVC file
-      shell: "sed -e 's/RELEASE_NAME/postgres-testing/g' -e 's/STORAGE_CLASS/local-hostpath-storage/g' -e 's/SIZE/2Gi/g' -e 's/ACCESS_MODE/ReadWriteOnce/g' -e 's|HOST_PATH|/bitnami/postgresql/Tools_intallation_container/|g' -e 's/RELEASE_NAMESPACE/testing/g' database-pv_pvc.yaml > pv-pvc.yaml"
+      shell: "sed -e 's/RELEASE_NAME/postgres-testing/g' -e 's/STORAGE_CLASS/local-hostpath-storage/g' -e 's/SIZE/2Gi/g' -e 's/ACCESS_MODE/ReadWriteOnce/g' -e 's|HOST_PATH|/bitnami/postgresql/Tools_intallation_container/|g' -e 's/RELEASE_SPACE/testing/g' database-pv_pvc.yaml > pv-pvc.yaml"
 
     - name: Create PV & PVC
       command: kubectl apply -f pv-pvc.yaml
