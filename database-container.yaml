@@ -4,15 +4,16 @@
   vars:
     helm_chart_name: bitnami/postgresql
     helm_release_name: postgres-testing
+    helm_release_namespace: testing
     postgres_db_name: platform
     postgres_username: user1
     postgres_password: pass1
     postgres_admin_password: Admin@123
     number_of_replicas: 2
     local_directory_path: /bitnami/postgresql/Tools_intallation_container/
-    deployment_namespace: testing
     size: 2Gi
-    storageClass: "local-hostpath-storage"
+    storageClass: local-hostpath-storage
+    accessMode: ReadWriteOnce
   tasks:
     - name: Check if Helm is installed
       command: helm version --short
@@ -28,22 +29,26 @@
       ignore_errors: yes
 
     - name: Uninstall PostgreSQL Helm Chart if it exists
-      command: helm uninstall {{ helm_release_name }} -n {{ deployment_namespace }}
+      command: helm uninstall {{ helm_release_name }} -n {{ helm_release_namespace }}
       ignore_errors: yes
 
-    - name: Apply the PV & PVC
+    - name: create PV & PVC file
       command: >
-        # Perform variable substitution
-        sed -i "s/{{ storageClass }}/$storageClass/g" database-pv_pvc.yaml
-        sed -i "s/{{ size }}/$size/g" database-pv_pvc.yaml
+        # Use sed to replace the variables in the YAML file
+        sed -e "s/{{ helm_release_name }}/$RELEASE_NAME/g" \
+            -e "s/{{ storageClass }}/$STORAGE_CLASS/g" \
+            -e "s/{{ size }}/$SIZE/g" \
+            -e "s/{{ accessMode }}/$ACCESS_MODE/g" \
+            -e "s/{{ local_directory_path }}/$HOST_PATH/g" \
+            -e "s/{{ helm_release_namespace }}/$RELEASE_NAMESPACE/g" database-pv_pvc.yaml > pv-pvc.yaml
         
-        # Apply the PV & PVC using kubectl
-        kubectl apply -f database-pv_pvc.yaml
-      register: pv_pvc_install
-
+    -  name: create PV & PVC
+       command: kubectl apply -f pv-pvc.yaml
+       register: pv_pvc_install
+       
     - name: Deploy PostgreSQL Helm Chart
       command: >
-        helm install {{ helm_release_name }} {{ helm_chart_name }} -n {{ deployment_namespace }}
+        helm install {{ helm_release_name }} {{ helm_chart_name }} -n {{ helm_release_namespace }}
         --set global.postgresql.auth.postgresPassword={{ postgres_admin_password }}
         --set global.postgresql.auth.username={{ postgres_username }}
         --set global.postgresql.auth.password={{ postgres_password }}
@@ -55,6 +60,7 @@
         --set volumePermissions.enabled=true
         --set primary.service.type=NodePort
         --set primary.service.nodePorts.postgresql=32009
+        --set primary.persistence.accessModes={{ accessMode }}
       when: pv_pvc_install.rc == 0
       register: helm_install
 
