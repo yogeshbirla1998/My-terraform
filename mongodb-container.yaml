@@ -1,0 +1,75 @@
+---
+- name: Deploy PostgreSQL Helm Chart
+  hosts: localhost
+  vars:
+    helm_chart_name: bitnami/mongodb
+    helm_release_name: mongodb-testing
+    helm_release_namespace: testing
+    mongodb_db_name: platform
+    mongodb_username: user1
+    mongodb_password: pass1
+    mongodb_admin_password: Admin@123
+    number_of_replicas: 2
+    local_directory_path: /bitnami/mongodb/Tools_intallation_container/
+    size: 2Gi
+    storageClass: local-hostpath-storage
+    accessMode: ReadWriteOnce
+    deployment_namespace: testing
+
+  tasks:
+    - name: Check if Helm is installed
+      command: helm version --short
+      register: helm_version
+      ignore_errors: yes
+
+    - name: Install Helm if not installed
+      command: curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+      when: helm_version.rc != 0
+
+    - name: Add Bitnami Helm repository
+      command: helm repo add bitnami https://charts.bitnami.com/bitnami
+      ignore_errors: yes
+
+    - name: Uninstall Mongodb Helm Chart if it exists
+      command: helm uninstall {{ helm_release_name }} -n {{ helm_release_namespace }}
+      ignore_errors: yes
+
+    - name: Create PV & PVC file
+      shell: 
+
+    - name: delete if exists PV & PVC
+      command: kubectl delete -f pv-pvc.yaml
+      ignore_errors: yes
+      
+    - name: Create PV & PVC
+      command: kubectl apply -f pv-pvc.yaml
+      register: pv_pvc_install
+
+    - name: Deploy PostgreSQL Helm Chart
+      command: >
+        helm install {{ helm_release_name }} {{ helm_chart_name }} -n {{ helm_release_namespace }}
+        --set auth.rootPassword={{ mongodb_admin_password }}
+        --set auth.usernames={{ mongodb_username }}
+        --set  auth.passwords={{ mongodb_password }}
+        --set auth.databases={{ mongodb_db_name }}
+        --set replicaCount={{ number_of_replicas }}
+        --set persistence.existingClaim={{ helm_release_name }}-pvc
+        --set volumePermissions.enabled=true
+        --set service.type=NodePort
+        --set service.nodePorts.mongodb=32008
+      when: pv_pvc_install.rc == 0
+      register: helm_install
+
+    - name: Wait for all pods to be in a 'Running' state
+      command: kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance={{ helm_release_name }} -n {{ deployment_namespace }} --timeout=300s
+      when: helm_install.rc == 0
+
+    - name: Print Kubernetes objects created by the Helm chart
+      command: kubectl get all -n {{ deployment_namespace }} -l release={{ helm_release_name }}
+      register: k8s_objects
+      when: helm_install.rc == 0
+
+    - name: Print NodePort service details
+      command: kubectl get svc -n {{ deployment_namespace }} {{ helm_release_name }}-mongodbql -o=json
+      register: nodeport_details
+      when: helm_install.rc == 0
