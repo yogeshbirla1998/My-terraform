@@ -4,12 +4,13 @@
   become: yes
   vars:
     helm_chart_name: bitnami/postgresql
-    helm_release_name: my-postgresql
-    postgres_db_name: your_database_name
-    postgres_user: your_username
-    postgres_password: your_password
+    helm_release_name: postgres-testing
+    postgres_db_name: platform
+    postgres_username: user1
+    postgres_password: pass1
+    postgres_admin_password: Admin@123
     number_of_replicas: 2
-    local_directory_path: /path/to/local/directory
+    local_directory_path: /bitnami/postgresql/Tools_intallation_container/
 
   tasks:
     - name: Check if Helm is installed
@@ -28,12 +29,14 @@
     - name: Deploy PostgreSQL Helm Chart
       command: |
         helm upgrade --install {{ helm_release_name }} {{ helm_chart_name }} \
-          --set postgresqlUsername={{ postgres_user }} \
-          --set postgresqlPassword={{ postgres_password }} \
-          --set postgresqlDatabase={{ postgres_db_name }} \
-          --set replicaCount={{ number_of_replicas }} \
-          --set persistence.existingClaim={{ helm_release_name }}-data \
-          --set persistence.mountPath={{ local_directory_path }}
+          -- set global.postgresql.auth.postgresPassword={{ postgres_admin_password }} \
+          --set  global.postgresql.auth.username={{ postgres_username }} \
+          --set  global.postgresql.auth.password={{ postgres_password }} \
+          --set global.postgresql.auth.database={{ postgres_db_name }} \
+          --set readReplicas.replicaCount={{ number_of_replicas }} \
+          --set primary.persistence.existingClaim={{ helm_release_name }}-data \
+          --set primary.persistence.mountPath={{ local_directory_path }} \
+          --set volumePermissions.enabled=true
       register: helm_install
 
     - name: Create a NodePort service for PostgreSQL
