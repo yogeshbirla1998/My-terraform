@@ -25,6 +25,10 @@
       command: helm repo add bitnami https://charts.bitnami.com/bitnami
       ignore_errors: yes
 
+    - name: Uninstall PostgreSQL Helm Chart if it exists
+      command: helm uninstall {{ helm_release_name }}
+      ignore_errors: yes
+
     - name: Deploy PostgreSQL Helm Chart
       command: >
         helm install {{ helm_release_name }} {{ helm_chart_name }} -n testing
