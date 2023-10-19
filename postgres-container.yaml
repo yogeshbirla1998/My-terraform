@@ -62,15 +62,15 @@
       register: helm_install
 
     - name: Wait for all pods to be in a 'Running' state
-      command: kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance={{ helm_release_name }} -n {{ deployment_namespace }} --timeout=300s
+      command: kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance={{ helm_release_name }} -n {{ helm_release_namespace }} --timeout=300s
       when: helm_install.rc == 0
 
     - name: Print Kubernetes objects created by the Helm chart
-      command: kubectl get all -n {{ deployment_namespace }} -l release={{ helm_release_name }}
+      command: kubectl get all -n {{ helm_release_namespace }} -l app.kubernetes.io/instance={{ helm_release_name }}
       register: k8s_objects
       when: helm_install.rc == 0
 
     - name: Print NodePort service details
-      command: kubectl get svc -n {{ deployment_namespace }} {{ helm_release_name }}-postgresql -o=json
+      command: kubectl get svc -n {{ helm_release_namespace }} {{ helm_release_name }}-postgresql -o=json
       register: nodeport_details
       when: helm_install.rc == 0
