@@ -12,6 +12,7 @@
     number_of_replicas: 2
     local_directory_path: /bitnami/postgresql/Tools_intallation_container/
     size: 2Gi
+    database: postgres
     storageClass: local-hostpath-storage
     accessMode: ReadWriteOnce
     deployment_namespace: testing
@@ -35,8 +36,8 @@
       ignore_errors: yes
 
     - name: Create PV & PVC file
-      shell: "sed -e 's/RELEASE_NAME/postgres-testing/g' -e 's/STORAGE_CLASS/local-hostpath-storage/g' -e 's/SIZE/2Gi/g' -e 's/ACCESS_MODE/ReadWriteOnce/g' -e 's|HOST_PATH|/bitnami/postgresql/Tools_intallation_container/|g' -e 's/RELEASE_SPACE/testing/g' database-pv_pvc.yaml > pv-pvc.yaml"
-
+      shell: "sed -e 's/RELEASE_NAME/{{ helm_release_name }}/g' -e 's/STORAGE_CLASS/{{ storageClass }}/g' -e 's/SIZE/{{ size }}/g' -e 's/ACCESS_MODE/{{ accessMode }}/g' -e 's/RELEASE_SPACE/{{ helm_release_namespace }}/g' -e 's/DATABASE/{{ database }}/g' database-pv_pvc.yaml > pv-pvc.yaml"
+      
     - name: delete if exists PV & PVC
       command: kubectl delete -f pv-pvc.yaml
       ignore_errors: yes
