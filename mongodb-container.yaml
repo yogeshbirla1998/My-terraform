@@ -6,8 +6,8 @@
     helm_release_name: mongodb-testing
     helm_release_namespace: testing
     mongodb_db_name: platform
-    mongodb_username: user1
-    mongodb_password: pass1
+    mongodb_username: [user1,user2]
+    mongodb_password: [pass1,pass2]
     mongodb_admin_password: Admin@123
     number_of_replicas: 2
     database: mongodb
