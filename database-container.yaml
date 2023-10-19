@@ -41,6 +41,7 @@
       register: helm_install
 
 - name: PostgreSQL Helm Chart Deployment Complete
+  hosts: localhost
   tasks:
     - name: Print NodePort service details
       command: kubectl get svc {{ helm_release_name }}-svc -o=json
