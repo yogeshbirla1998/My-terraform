@@ -49,13 +49,10 @@
         --set global.postgresql.auth.password={{ postgres_password }}
         --set global.postgresql.auth.database={{ postgres_db_name }}
         --set readReplicas.replicaCount={{ number_of_replicas }}
-        --set primary.persistence.mountPath={{ local_directory_path }}
-        --set primary.persistence.storageClass=local-hostpath-storage
-        --set primary.persistence.size=2Gi
+        --set primary.persistence.existingClaim={{ helm_chart_name }}-pvc
         --set volumePermissions.enabled=true
         --set primary.service.type=NodePort
         --set primary.service.nodePorts.postgresql=32009
-        --set primary.persistence.accessModes={{ accessMode }}
       when: pv_pvc_install.rc == 0
       register: helm_install
 
