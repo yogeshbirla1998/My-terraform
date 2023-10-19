@@ -34,13 +34,13 @@
 
     - name: create PV & PVC file
       command: >
-        # Use sed to replace the variables in the YAML file
-        sed -e "s/{{ helm_release_name }}/$RELEASE_NAME/g" \
-            -e "s/{{ storageClass }}/$STORAGE_CLASS/g" \
-            -e "s/{{ size }}/$SIZE/g" \
-            -e "s/{{ accessMode }}/$ACCESS_MODE/g" \
-            -e "s/{{ local_directory_path }}/$HOST_PATH/g" \
-            -e "s/{{ helm_release_namespace }}/$RELEASE_NAMESPACE/g" database-pv_pvc.yaml > pv-pvc.yaml
+        sed -e "s/{{ helm_release_name }}/{{ RELEASE_NAME }}/g" \
+            -e "s/{{ storageClass }}/{{ STORAGE_CLASS }}/g" \
+            -e "s/{{ size }}/{{ SIZE }}/g" \
+            -e "s/{{ accessMode }}/{{ ACCESS_MODE }}/g" \
+            -e "s/{{ local_directory_path }}/{{ HOST_PATH }}/g" \
+            -e "s/{{ helm_release_namespace }}/{{ RELEASE_NAMESPACE }}/g" database-pv_pvc.yaml > pv-pvc.yaml
+
         
     -  name: create PV & PVC
        command: kubectl apply -f pv-pvc.yaml
