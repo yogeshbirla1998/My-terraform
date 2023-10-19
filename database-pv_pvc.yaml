@@ -1,0 +1,31 @@
+# Create PV & PVC
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgresql-pv
+  labels:
+    type: local
+spec:
+  storageClassName: "{{ storageClass }}"
+  capacity:
+    storage: "{{ size }}"
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+    
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgresql-pv-claim
+spec:
+  storageClassName: "{{ storageClass }}"
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: "{{ size }}"
+
