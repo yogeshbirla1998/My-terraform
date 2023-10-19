@@ -10,7 +10,7 @@
     mongodb_password: pass1
     mongodb_admin_password: Admin@123
     number_of_replicas: 2
-    local_directory_path: /bitnami/mongodb/Tools_intallation_container/
+    database: mongodb
     size: 2Gi
     storageClass: local-hostpath-storage
     accessMode: ReadWriteOnce
@@ -35,7 +35,7 @@
       ignore_errors: yes
 
     - name: Create PV & PVC file
-      shell: "sed -e 's/RELEASE_NAME/{{ helm_release_name }}/g' -e 's/STORAGE_CLASS/{{ storageClass }}/g' -e 's/SIZE/{{ size }}/g' -e 's/ACCESS_MODE/{{ accessMode }}/g' -e 's/RELEASE_SPACE/{{ helm_release_namespace }}/g' database-pv_pvc.yaml > pv-pvc.yaml"
+      shell: "sed -e 's/RELEASE_NAME/{{ helm_release_name }}/g' -e 's/STORAGE_CLASS/{{ storageClass }}/g' -e 's/SIZE/{{ size }}/g' -e 's/ACCESS_MODE/{{ accessMode }}/g' -e 's/RELEASE_SPACE/{{ helm_release_namespace }}/g' -e 's/DATABASE/{{ database }}/g' database-pv_pvc.yaml > pv-pvc.yaml"
 
     - name: delete if exists PV & PVC
       command: kubectl delete -f pv-pvc.yaml
