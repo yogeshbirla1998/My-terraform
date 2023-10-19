@@ -35,7 +35,7 @@
       ignore_errors: yes
 
     - name: Create PV & PVC file
-      shell: "sed -e -i 's/RELEASE_NAME/{{ helm_release_name }}/g' -e 's/STORAGE_CLASS/{{ storageClass }}/g' -e 's/SIZE/{{ size }}/g' -e 's/ACCESS_MODE/{{ accessMode }}/g' -e 's/HOST_PATH/{{ local_directory_path }}/g' -e 's/RELEASE_SPACE/{{ helm_release_namespace }}/g' database-pv_pvc.yaml > pv-pvc.yaml"
+      shell: "sed -i 's/RELEASE_NAME/{{ helm_release_name }}/g' -i 's/STORAGE_CLASS/{{ storageClass }}/g' -i 's/SIZE/{{ size }}/g' -i 's/ACCESS_MODE/{{ accessMode }}/g' -i 's/HOST_PATH/{{ local_directory_path }}/g' -i 's/RELEASE_SPACE/{{ helm_release_namespace }}/g' database-pv_pvc.yaml > pv-pvc.yaml"
 
     - name: delete if exists PV & PVC
       command: kubectl delete -f pv-pvc.yaml
