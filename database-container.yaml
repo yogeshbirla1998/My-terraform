@@ -11,7 +11,8 @@
     number_of_replicas: 2
     local_directory_path: /bitnami/postgresql/Tools_intallation_container/
     deployment_namespace: testing
-
+    size: 2Gi
+    storageClass: "local-hostpath-storage"
   tasks:
     - name: Check if Helm is installed
       command: helm version --short
@@ -31,7 +32,9 @@
       ignore_errors: yes
 
     - name: Apply the PV & PVC
-      command: kubectl apply -f database-pv_pvc.yaml
+      ansible.builtin.command: kubectl apply -f database-pv_pvc.yaml
+      args:
+        executable: /bin/bash
 
     - name: Deploy PostgreSQL Helm Chart
       command: >
