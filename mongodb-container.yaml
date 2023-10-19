@@ -6,8 +6,8 @@
     helm_release_name: mongodb-testing
     helm_release_namespace: testing
     mongodb_db_name: platform
-    mongodb_username: ["user1"]
-    mongodb_password: ["pass1"]
+    mongodb_username: user1
+    mongodb_password: pass1
     mongodb_admin_password: Admin@123
     number_of_replicas: 2
     database: mongodb
@@ -49,9 +49,9 @@
       command: >
         helm install {{ helm_release_name }} {{ helm_chart_name }} -n {{ helm_release_namespace }}
         --set auth.rootPassword={{ mongodb_admin_password }}
-        --set auth.usernames={{ mongodb_username }}
-        --set  auth.passwords={{ mongodb_password }}
-        --set auth.databases={{ mongodb_db_name }}
+        --set auth.usernames[0]={{ mongodb_username }}
+        --set  auth.passwords[0]={{ mongodb_password }}
+        --set auth.databases[0]={{ mongodb_db_name }}
         --set replicaCount={{ number_of_replicas }}
         --set persistence.existingClaim={{ helm_release_name }}-pvc
         --set volumePermissions.enabled=true
