@@ -30,6 +30,9 @@
       command: helm uninstall {{ helm_release_name }} -n {{ deployment_namespace }}
       ignore_errors: yes
 
+    - name: Apply the PV & PVC
+      command: kubectl apply -f database-pv_pvc.yaml
+
     - name: Deploy PostgreSQL Helm Chart
       command: >
         helm install {{ helm_release_name }} {{ helm_chart_name }} -n {{ deployment_namespace }}
