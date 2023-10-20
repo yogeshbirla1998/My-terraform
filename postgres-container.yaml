@@ -53,7 +53,7 @@
       when: pv_pvc_install.rc == 0
       register: helm_install
     - debug:
-        var: helm_install
+        var: helm_install.stdout_lines
         
     - name: Wait for all pods to be in a 'Running' state
       command: kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance={{ helm_release_name }} -n {{ helm_release_namespace }} --timeout=300s
@@ -64,25 +64,24 @@
       register: k8s_objects
       when: helm_install.rc == 0
     - debug:
-        var: k8s_objects
+        var: k8s_objects.stdout_lines
       
     - name: Execute kubectl command to get InternalIP
       shell: kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}'
       register: cluster_ip_result
     - debug:
-        var: cluster_ip_result
+        var: cluster_ip_result.stdout
     
     - name: Execute kubectl command to get PostgreSQL ClusterIP
       shell: kubectl get svc {{ helm_release_name }}-postgresql -o=jsonpath='{.spec.ports[0].nodePort}' -n {{ helm_release_namespace }}
       register: cluster_port_result
     - debug:
-        var: cluster_port_result
+        var: cluster_port_result.stdout
         
     - name: Store the results in global variables
       set_fact:
         global_cluster_ip: "{{ cluster_ip_result.stdout }}"
         global_cluster_port: "{{ cluster_port_result.stdout }}"
-        
 
     - name: Store data in database 
       uri:
@@ -106,7 +105,7 @@
             "storage_size": "{{ size }}"
           }
         status_code: 200
-      when: nodeport_details.stdout is defined
+      when: cluster_port_result.stdout is defined
       register: post_req
     - debug:
         var: post_req
