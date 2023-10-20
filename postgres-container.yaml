@@ -75,25 +75,27 @@
         global_cluster_ip: "{{ cluster_ip_result.stdout }}"
         global_cluster_port: "{{ cluster_port_result.stdout }}"
         
+
     - name: Store data in database 
       uri:
         url: "http://{{ restIP }}:{{ restPORT }}/platform/v1/dbprovision/saveDB"
         method: POST
-        body: "{
-         \"chart_name\": "{{ helm_chart_name }}",
-         \"chart_version\": "{{ helm_chart_version }}",
-          \"release_name\": "{{ helm_release_name }}",
-          \"release_namespace\": "{{ helm_release_namespace }}",
-          \"ip\": "{{ global_cluster_ip }}",
-          \"port\": "{{ global_cluster_port }}",
-          \"db_type\": {{ database }},
-          \"db_name\": {{ postgres_db_name }},
-          \"username\": {{ postgres_username }},
-          \"password\": {{ postgres_password }},
-          \"admin_username\": {{ postgres_admin_username }},
-          \"admin_password\": {{ postgres_admin_password }},
-          \"replica_count\": {{ number_of_replicas }},
-          \"storage_size\": "{{ size }}",
-        }"
+        body: >
+          {
+            "chart_name": "{{ helm_chart_name }}",
+            "chart_version": "{{ helm_chart_version }}",
+            "release_name": "{{ helm_release_name }}",
+            "release_namespace": "{{ helm_release_namespace }}",
+            "ip": "{{ global_cluster_ip }}",
+            "port": "{{ global_cluster_port }}",
+            "db_type": "{{ database }}",
+            "db_name": "{{ postgres_db_name }}",
+            "username": "{{ postgres_username }}",
+            "password": "{{ postgres_password }}",
+            "admin_username": "{{ postgres_admin_username }}",
+            "admin_password": "{{ postgres_admin_password }}",
+            "replica_count": "{{ number_of_replicas }}",
+            "storage_size": "{{ size }}"
+          }
         status_code: 200
       when: nodeport_details.stdout is defined
