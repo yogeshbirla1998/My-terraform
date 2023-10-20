@@ -104,8 +104,8 @@
           \"password\": {{ postgres_password }},
           \"admin_username\": {{ postgres_admin_username }},
           \"admin_password\": {{ postgres_admin_password }},
-          \"replicaCount\": {{ number_of_replicas }},
-          \"size\": \"{{ size }}\",
+          \"replica_count\": {{ number_of_replicas }},
+          \"storage_size\": \"{{ size }}\",
         }"
         status_code: 200
       when: nodeport_details.stdout is defined
