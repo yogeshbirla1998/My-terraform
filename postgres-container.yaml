@@ -67,7 +67,7 @@
       register: cluster_ip_result
     
     - name: Execute kubectl command to get PostgreSQL ClusterIP
-      shell: kubectl get svc postgres-1697799038-postgresql -o=jsonpath='{.spec.ports[0].nodePort}' -n testing
+      shell: kubectl get svc {{ helm_release_name }}-postgresql -o=jsonpath='{.spec.ports[0].nodePort}' -n {{ helm_release_namespace }}
       register: cluster_port_result
 
     - name: Store the results in global variables
