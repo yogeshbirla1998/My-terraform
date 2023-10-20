@@ -2,20 +2,20 @@
 - name: Deploy PostgreSQL Helm Chart
   hosts: localhost
   vars:
-    restIP: {{ restIP }}
-    restPORT: {{ restPORT }}
+    restIP: "{{ restIP }}"
+    restPORT: "{{ restPORT }}"
     helm_chart_name: bitnami/postgresql
-    helm_chart_version: latest
+    helm_chart_version: "{{ helm_chart_version }}"
     helm_release_name: "postgres-{{ ansible_date_time.epoch }}"
     helm_release_namespace: testing
-    postgres_db_name: platform
-    postgres_username: user1
-    postgres_password: pass1
+    postgres_db_name: "{{ postgres_db_name }}"
+    postgres_username: "{{postgres_username }}"
+    postgres_password: "{{ postgres_password }}"
     postgres_admin_username: postgres
-    postgres_admin_password: Admin@123
+    postgres_admin_password: "{{ postgres_admin_password }}"
     number_of_replicas: 2
-    size: 2Gi
-    database: postgresql
+    size: "{{ size }}"
+    database: "{{ database }}"
     storageClass: local-hostpath-storage
     accessMode: ReadWriteOnce
   tasks:
