@@ -99,3 +99,12 @@
           }
         status_code: 200
       when: nodeport_details.stdout is defined
+      register: post_req
+    
+    - name: printing results
+      debug:
+        var: 
+          - k8s_objects
+          - global_cluster_ip
+          - global_cluster_port
+          - post_req
