@@ -85,7 +85,7 @@
 
     - name: Store data in database 
       uri:
-        url: "http://{{ restIP }}:{{ restPORT }}/platform/v1/dbprovision/saveDB"
+        url: "http://{{ restIP }}:{{ restPORT }}/platform/v1/database/saveDB"
         method: POST
         body: >
           {
