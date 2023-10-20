@@ -61,42 +61,31 @@
       command: kubectl get all -n {{ helm_release_namespace }} -l app.kubernetes.io/instance={{ helm_release_name }}
       register: k8s_objects
       when: helm_install.rc == 0
-
-    - name: Print NodePort service details
-      command: kubectl get svc -n {{ helm_release_namespace }} {{ helm_release_name }}-postgresql -o=json
-      register: nodeport_details
-      when: helm_install.rc == 0
       
-    - name: Debug Kubernetes objects
-      debug:
-        var: k8s_objects.stdout
+    - name: Execute kubectl command to get InternalIP
+      shell: kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}'
+      register: cluster_ip_result
     
-    - name: Debug NodePort service details
-      debug:
-        var: nodeport_details.stdout
-    
-    - name: Get NodePort and Private IP
+    - name: Execute kubectl command to get PostgreSQL ClusterIP
+      shell: kubectl get svc postgres-1697799038-postgresql -o=jsonpath='{.spec.ports[0].nodePort}' -n testing
+      register: cluster_port_result
+
+    - name: Store the results in global variables
       set_fact:
-        nodeport: "{{ nodeport_details.stdout | from_json }}"
-        private_ip: "{{ nodeport_details.stdout | from_json }}"
-      when: nodeport_details.stdout is defined
-
-    - name: Display NodePort and Private IP
-      debug:
-        msg: "NodePort: {{ nodeport.spec.ports[0].nodePort }}, Private IP: {{ private_ip.status.loadBalancer.ingress[0].ip }}"
-      when: nodeport_details.stdout is defined
-
+        global_cluster_ip: "{{ cluster_ip_result.stdout }}"
+        global_cluster_port: "{{ cluster_port_result.stdout }}"
+        
     - name: Store data in database 
       uri:
         url: "http://{{ restIP }}:{{ restPORT }}/platform/v1/dbprovision/saveDB"
         method: POST
         body: "{
-         \"chart_name\": \"{{ helm_chart_name }}\",
-         \"chart_version\": \"{{ helm_chart_version }}\",
-          \"release_name\": \"{{ helm_release_name }}\",
-          \"release_namespace\": \"{{ helm_release_namespace }}\",
-          \"ip\": \"{{ private_ip.status.loadBalancer.ingress[0].ip }}\",
-          \"port\": {{ nodeport.spec.ports[0].nodePort }},
+         \"chart_name\": "{{ helm_chart_name }}",
+         \"chart_version\": "{{ helm_chart_version }}",
+          \"release_name\": "{{ helm_release_name }}",
+          \"release_namespace\": "{{ helm_release_namespace }}",
+          \"ip\": "{{ global_cluster_ip }}",
+          \"port\": "{{ global_cluster_port }}",
           \"db_type\": {{ database }},
           \"db_name\": {{ postgres_db_name }},
           \"username\": {{ postgres_username }},
@@ -104,7 +93,7 @@
           \"admin_username\": {{ postgres_admin_username }},
           \"admin_password\": {{ postgres_admin_password }},
           \"replica_count\": {{ number_of_replicas }},
-          \"storage_size\": \"{{ size }}\",
+          \"storage_size\": "{{ size }}",
         }"
         status_code: 200
       when: nodeport_details.stdout is defined
