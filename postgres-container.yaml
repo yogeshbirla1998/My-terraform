@@ -89,7 +89,7 @@
 
     - name: Store data in database 
       uri:
-        url: "http://10.63.35.244:8080/platform/v1/dbprovision/saveDB"
+        url: "http://{{ restIP }}:{{ restPORT }}/platform/v1/dbprovision/saveDB"
         method: POST
         body: "{
          \"chart_name\": \"{{ helm_chart_name }}\",
