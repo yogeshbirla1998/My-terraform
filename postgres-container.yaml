@@ -87,6 +87,9 @@
       uri:
         url: "http://{{ restIP }}:{{ restPORT }}/platform/v1/database/saveDB"
         method: POST
+        body_format: json
+        headers:
+          Content-Type: "application/json"
         body: >
           {
             "chart_name": "{{ helm_chart_name }}",
