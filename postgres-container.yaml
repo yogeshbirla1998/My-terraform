@@ -2,6 +2,8 @@
 - name: Deploy PostgreSQL Helm Chart
   hosts: localhost
   vars:
+    restIP: {{ restIP }}
+    restPORT: {{ restPORT }}
     helm_chart_name: bitnami/postgresql
     helm_chart_version: latest
     helm_release_name: "postgres-{{ ansible_date_time.epoch }}"
@@ -16,8 +18,6 @@
     database: postgresql
     storageClass: local-hostpath-storage
     accessMode: ReadWriteOnce
-    deployment_namespace: testing
-
   tasks:
     - name: Check if Helm is installed
       command: helm version --short
