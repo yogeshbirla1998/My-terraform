@@ -7,7 +7,7 @@
     helm_chart_name: bitnami/postgresql
     helm_chart_version: "{{ helm_chart_version }}"
     helm_release_name: "postgres-{{ ansible_date_time.epoch }}"
-    helm_release_namespace: testing
+    helm_release_namespace: "{{ helm_release_namespace }}"
     postgres_db_name: "{{ postgres_db_name }}"
     postgres_username: "{{postgres_username }}"
     postgres_password: "{{ postgres_password }}"
