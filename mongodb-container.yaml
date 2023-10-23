@@ -105,11 +105,11 @@
             "ip": "{{ global_cluster_ip }}",
             "port": "{{ global_cluster_port }}",
             "db_type": "{{ database }}",
-            "db_name": "{{ postgres_db_name }}",
-            "username": "{{ postgres_username }}",
-            "password": "{{ postgres_password }}",
-            "admin_username": "{{ postgres_admin_username }}",
-            "admin_password": "{{ postgres_admin_password }}",
+            "db_name": "{{ db_name }}",
+            "username": "{{ username }}",
+            "password": "{{ password }}",
+            "admin_username": "{{ admin_username }}",
+            "admin_password": "{{ admin_password }}",
             "replica_count": "{{ number_of_replicas }}",
             "storage_size": "{{ size }}"
           }
