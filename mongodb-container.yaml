@@ -8,11 +8,11 @@
     helm_chart_version: "{{ helm_chart_version }}"
     helm_release_name: "mongodb-{{ ansible_date_time.epoch }}"
     helm_release_namespace: "{{ helm_release_namespace }}"
-    postgres_db_name: "{{ postgres_db_name }}"
-    postgres_username: "{{postgres_username }}"
-    postgres_password: "{{ postgres_password }}"
-    postgres_admin_username: postgres
-    postgres_admin_password: "{{ postgres_admin_password }}"
+    db_name: "{{ db_name }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    admin_username: root
+    admin_password: "{{ admin_password }}"
     number_of_replicas: 2
     size: "{{ size }}"
     database: "{{ database }}"
@@ -48,10 +48,10 @@
     - name: Deploy PostgreSQL Helm Chart
       command: >
         helm install {{ helm_release_name }} {{ helm_chart_name }} -n {{ helm_release_namespace }}
-        --set auth.rootPassword={{ mongodb_admin_password }}
-        --set auth.usernames[0]={{ mongodb_username }}
-        --set  auth.passwords[0]={{ mongodb_password }}
-        --set auth.databases[0]={{ mongodb_db_name }}
+        --set auth.rootPassword={{ admin_password }}
+        --set auth.usernames[0]={{ username }}
+        --set  auth.passwords[0]={{ password }}
+        --set auth.databases[0]={{ db_name }}
         --set replicaCount={{ number_of_replicas }}
         --set persistence.existingClaim={{ helm_release_name }}-pvc
         --set volumePermissions.enabled=true
