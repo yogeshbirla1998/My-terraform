@@ -8,11 +8,11 @@
     helm_chart_version: "{{ helm_chart_version }}"
     helm_release_name: "postgres-{{ ansible_date_time.epoch }}"
     helm_release_namespace: "{{ helm_release_namespace }}"
-    postgres_db_name: "{{ postgres_db_name }}"
-    postgres_username: "{{postgres_username }}"
-    postgres_password: "{{ postgres_password }}"
-    postgres_admin_username: postgres
-    postgres_admin_password: "{{ postgres_admin_password }}"
+    db_name: "{{ db_name }}"
+    username: "{{ username }}"
+    postgres_password: "{{ password }}"
+    admin_username: postgres
+    admin_password: "{{ admin_password }}"
     number_of_replicas: 2
     size: "{{ size }}"
     database: "{{ database }}"
@@ -47,10 +47,10 @@
     - name: Deploy PostgreSQL Helm Chart
       command: >
         helm install {{ helm_release_name }} {{ helm_chart_name }} -n {{ helm_release_namespace }}
-        --set global.postgresql.auth.postgresPassword={{ postgres_admin_password }}
-        --set global.postgresql.auth.username={{ postgres_username }}
-        --set global.postgresql.auth.password={{ postgres_password }}
-        --set global.postgresql.auth.database={{ postgres_db_name }}
+        --set global.postgresql.auth.postgresPassword={{ admin_password }}
+        --set global.postgresql.auth.username={{ username }}
+        --set global.postgresql.auth.password={{ password }}
+        --set global.postgresql.auth.database={{ db_name }}
         --set readReplicas.replicaCount={{ number_of_replicas }}
         --set primary.persistence.existingClaim={{ helm_release_name }}-pvc
         --set volumePermissions.enabled=true
@@ -104,11 +104,11 @@
             "ip": "{{ global_cluster_ip }}",
             "port": "{{ global_cluster_port }}",
             "db_type": "{{ database }}",
-            "db_name": "{{ postgres_db_name }}",
-            "username": "{{ postgres_username }}",
-            "password": "{{ postgres_password }}",
-            "admin_username": "{{ postgres_admin_username }}",
-            "admin_password": "{{ postgres_admin_password }}",
+            "db_name": "{{ db_name }}",
+            "username": "{{ username }}",
+            "password": "{{ password }}",
+            "admin_username": "{{ admin_username }}",
+            "admin_password": "{{ admin_password }}",
             "replica_count": "{{ number_of_replicas }}",
             "storage_size": "{{ size }}"
           }
