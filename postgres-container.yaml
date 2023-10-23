@@ -13,7 +13,7 @@
     postgres_password: "{{ password }}"
     admin_username: postgres
     admin_password: "{{ admin_password }}"
-    number_of_replicas: 2
+    number_of_replicas: 1
     size: "{{ size }}"
     database: "{{ database }}"
     storageClass: local-hostpath-storage
