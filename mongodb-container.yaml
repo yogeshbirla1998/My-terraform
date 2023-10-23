@@ -27,7 +27,12 @@
     - name: Install Helm if not installed
       command: curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
       when: helm_version.rc != 0
-
+      
+    - name: Check if namespace exists
+      command: kubectl create namespace {{ helm_release_namespace }}
+      register: ns_exists
+      ignore_errors: yes
+      
     - name: Add Bitnami Helm repository
       command: helm repo add bitnami https://charts.bitnami.com/bitnami
       ignore_errors: yes
