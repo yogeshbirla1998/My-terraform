@@ -18,7 +18,6 @@
     database: "{{ database }}"
     storageClass: local-hostpath-storage
     accessMode: ReadWriteOnce
-    subPath: "{{ helm_release_name }}"
   tasks:
     - name: Check if Helm is installed
       command: helm version --short
@@ -38,7 +37,7 @@
       ignore_errors: yes
 
     - name: Create PV & PVC file
-      shell: "sed -e 's/RELEASE_NAME/{{ helm_release_name }}/g' -e 's/STORAGE_CLASS/{{ storageClass }}/g' -e 's/SIZE/{{ size }}/g' -e 's/ACCESS_MODE/{{ accessMode }}/g' -e 's/RELEASE_SPACE/{{ helm_release_namespace }}/g' -e 's/DATABASE/{{ database }}/g' database-pv_pvc.yaml > pv-pvc.yaml"
+      shell: "sed -e 's/RELEASE_NAME/{{ helm_release_name }}/g' -e 's/STORAGE_CLASS/{{ storageClass }}/g' -e 's/SIZE/{{ size }}/g' -e 's/ACCESS_MODE/{{ accessMode }}/g' -e 's/RELEASE_SPACE/{{ helm_release_namespace }}/g' -e 's/DATABASE/{{ database }}/g' -e 's/SUBPATH/{{ helm_release_name }}/g' database-pv_pvc.yaml > pv-pvc.yaml"
       
     - name: Create PV & PVC
       command: kubectl apply -f pv-pvc.yaml
