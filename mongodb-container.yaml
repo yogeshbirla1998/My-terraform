@@ -1,21 +1,24 @@
 ---
-- name: Deploy PostgreSQL Helm Chart
+- name: Deploy Mongodb Helm Chart
   hosts: localhost
   vars:
+    restIP: "{{ restIP }}"
+    restPORT: "{{ restPORT }}"
     helm_chart_name: bitnami/mongodb
-    helm_release_name: mongodb-testing
+    helm_chart_version: "{{ helm_chart_version }}"
+    helm_release_name: "postgres-{{ ansible_date_time.epoch }}"
     helm_release_namespace: testing
-    mongodb_db_name: platform
-    mongodb_username: user1
-    mongodb_password: pass1
-    mongodb_admin_password: Admin@123
+    postgres_db_name: "{{ postgres_db_name }}"
+    postgres_username: "{{postgres_username }}"
+    postgres_password: "{{ postgres_password }}"
+    postgres_admin_username: postgres
+    postgres_admin_password: "{{ postgres_admin_password }}"
     number_of_replicas: 2
-    database: mongodb
-    size: 2Gi
+    size: "{{ size }}"
+    database: "{{ database }}"
     storageClass: local-hostpath-storage
     accessMode: ReadWriteOnce
-    deployment_namespace: testing
-
+    subPath: "{{ helm_release_name }}"
   tasks:
     - name: Check if Helm is installed
       command: helm version --short
@@ -36,16 +39,13 @@
 
     - name: Create PV & PVC file
       shell: "sed -e 's/RELEASE_NAME/{{ helm_release_name }}/g' -e 's/STORAGE_CLASS/{{ storageClass }}/g' -e 's/SIZE/{{ size }}/g' -e 's/ACCESS_MODE/{{ accessMode }}/g' -e 's/RELEASE_SPACE/{{ helm_release_namespace }}/g' -e 's/DATABASE/{{ database }}/g' database-pv_pvc.yaml > pv-pvc.yaml"
-
-    - name: delete if exists PV & PVC
-      command: kubectl delete -f pv-pvc.yaml
-      ignore_errors: yes
       
     - name: Create PV & PVC
       command: kubectl apply -f pv-pvc.yaml
       register: pv_pvc_install
 
-    - name: Deploy Mongodb Helm Chart
+
+    - name: Deploy PostgreSQL Helm Chart
       command: >
         helm install {{ helm_release_name }} {{ helm_chart_name }} -n {{ helm_release_namespace }}
         --set auth.rootPassword={{ mongodb_admin_password }}
@@ -56,10 +56,11 @@
         --set persistence.existingClaim={{ helm_release_name }}-pvc
         --set volumePermissions.enabled=true
         --set service.type=NodePort
-        --set service.nodePorts.mongodb=32008
       when: pv_pvc_install.rc == 0
       register: helm_install
-
+    - debug:
+        var: helm_install.stdout_lines
+        
     - name: Wait for all pods to be in a 'Running' state
       command: kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance={{ helm_release_name }} -n {{ helm_release_namespace }} --timeout=300s
       when: helm_install.rc == 0
@@ -68,8 +69,53 @@
       command: kubectl get all -n {{ helm_release_namespace }} -l app.kubernetes.io/instance={{ helm_release_name }}
       register: k8s_objects
       when: helm_install.rc == 0
+    - debug:
+        var: k8s_objects.stdout_lines
+      
+    - name: Execute kubectl command to get InternalIP
+      shell: kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}'
+      register: cluster_ip_result
+    - debug:
+        var: cluster_ip_result.stdout
+    
+    - name: Execute kubectl command to get PostgreSQL ClusterIP
+      shell: kubectl get svc -n {{ helm_release_namespace }} {{ helm_release_name }} -o=jsonpath='{.spec.ports[0].nodePort}'
+      register: cluster_port_result
+    - debug:
+        var: cluster_port_result.stdout
+        
+    - name: Store the results in global variables
+      set_fact:
+        global_cluster_ip: "{{ cluster_ip_result.stdout }}"
+        global_cluster_port: "{{ cluster_port_result.stdout }}"
 
-    - name: Print NodePort service details
-      command: kubectl get svc -n {{ helm_release_namespace }} {{ helm_release_name }} -o=json
-      register: nodeport_details
-      when: helm_install.rc == 0
+    - name: Store data in database 
+      uri:
+        url: "http://{{ restIP }}:{{ restPORT }}/platform/v1/database/saveDB"
+        method: POST
+        body_format: json
+        headers:
+          Content-Type: "application/json"
+        body: >
+          {
+            "chart_name": "{{ helm_chart_name }}",
+            "chart_version": "{{ helm_chart_version }}",
+            "release_name": "{{ helm_release_name }}",
+            "release_namespace": "{{ helm_release_namespace }}",
+            "ip": "{{ global_cluster_ip }}",
+            "port": "{{ global_cluster_port }}",
+            "db_type": "{{ database }}",
+            "db_name": "{{ postgres_db_name }}",
+            "username": "{{ postgres_username }}",
+            "password": "{{ postgres_password }}",
+            "admin_username": "{{ postgres_admin_username }}",
+            "admin_password": "{{ postgres_admin_password }}",
+            "replica_count": "{{ number_of_replicas }}",
+            "storage_size": "{{ size }}"
+          }
+        status_code: 200
+      when: cluster_port_result.stdout is defined
+      register: post_req
+    - debug:
+        var: post_req
+
