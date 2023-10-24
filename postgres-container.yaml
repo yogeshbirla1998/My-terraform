@@ -103,7 +103,7 @@
         global_cluster_ip: "{{ cluster_ip_result.stdout }}"
         global_cluster_port: "{{ cluster_port_result.stdout }}"
 
-    - name: Store data in database 
+    - name: Store database info 
       uri:
         url: "http://{{ restIP }}:{{ restPORT }}/platform/v1/database/saveDB"
         method: POST
@@ -128,6 +128,28 @@
           }
         status_code: 200
       when: cluster_port_result.stdout is defined
-      register: post_req
+      register: post_req_DB
     - debug:
-        var: post_req
+        var: post_req_DB
+
+    - name: Store user's info 
+      uri:
+        url: "http://{{ restIP }}:{{ restPORT }}/platform/v1/database/saveUser"
+        method: POST
+        body_format: json
+        headers:
+          Content-Type: "application/json"
+        body: >
+          {
+            "db_name": "{{ db_name }}",
+            "db_type": "{{ db_type }}",
+            "db_mode": "{{ db_mode }}",
+            "username": "{{ username }}",
+            "password": "{{ password }}",
+          }
+        status_code: 200
+      when: cluster_port_result.stdout is defined
+      register: post_req_user
+    - debug:
+        var: post_req_user
+
