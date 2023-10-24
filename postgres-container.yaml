@@ -10,13 +10,14 @@
     helm_release_namespace: "{{ helm_release_namespace }}"
     db_name: "{{ db_name }}"
     db_mode: "{{ db_mode }}"
+    db_type: "{{ db_type }}"
     admin_username: "{{ admin_username }}"
     admin_password: "{{ admin_password }}"
     username: "{{ username }}"
     password: "{{ password }}"
     number_of_replicas: "{{ number_of_replicas }}"
     size: "{{ size }}"
-    database: "{{ database }}"
+    database: "{{ db_type }}"
     storageClass: "{{ storageClass }}"
     accessMode: "{{ accessMode }}"
   tasks:
@@ -118,7 +119,7 @@
             "release_namespace": "{{ helm_release_namespace }}",
             "ip": "{{ global_cluster_ip }}",
             "port": "{{ global_cluster_port }}",
-            "db_type": "{{ database }}",
+            "db_type": "{{ db_type }}",
             "db_name": "{{ db_name }}",
             "db_mode": "{{ db_mode }}",
             "admin_username": "{{ admin_username }}",
