@@ -45,7 +45,7 @@
       command: kubectl apply -f pv-pvc.yaml
       register: pv_pvc_install
       
-    - name: Deploy PostgreSQL Helm Chart
+    - name: Deploy PostgreSQL Helm Chart in exclusive Mode
       command: >
         helm install {{ helm_release_name }} {{ helm_chart_name }} -n {{ helm_release_namespace }}
         --set global.postgresql.auth.postgresPassword={{ admin_password }}
@@ -56,7 +56,21 @@
         --set primary.persistence.existingClaim={{ helm_release_name }}-pvc
         --set volumePermissions.enabled=true
         --set primary.service.type=NodePort
-      when: pv_pvc_install.rc == 0
+      when: pv_pvc_install.rc == 0 && {{ db_mode }} == "exclusive"
+      register: helm_install
+    - debug:
+        var: helm_install.stdout_lines
+
+    - name: Deploy PostgreSQL Helm Chart in shared Mode
+      command: >
+        helm install {{ helm_release_name }} {{ helm_chart_name }} -n {{ helm_release_namespace }}
+        --set global.postgresql.auth.postgresPassword={{ admin_password }}
+        --set global.postgresql.auth.database={{ db_name }}
+        --set readReplicas.replicaCount={{ number_of_replicas }}
+        --set primary.persistence.existingClaim={{ helm_release_name }}-pvc
+        --set volumePermissions.enabled=true
+        --set primary.service.type=NodePort
+      when: pv_pvc_install.rc == 0 && {{ db_mode }} == "exclusive"
       register: helm_install
     - debug:
         var: helm_install.stdout_lines
