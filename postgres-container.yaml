@@ -56,7 +56,7 @@
         --set primary.persistence.existingClaim={{ helm_release_name }}-pvc
         --set volumePermissions.enabled=true
         --set primary.service.type=NodePort
-      when: pv_pvc_install.rc == 0 && {{ db_mode }} == "exclusive"
+      when: pv_pvc_install.rc == 0 and db_mode == "exclusive"
       register: helm_install
     - debug:
         var: helm_install.stdout_lines
@@ -70,7 +70,7 @@
         --set primary.persistence.existingClaim={{ helm_release_name }}-pvc
         --set volumePermissions.enabled=true
         --set primary.service.type=NodePort
-      when: pv_pvc_install.rc == 0 && {{ db_mode }} == "exclusive"
+      when: pv_pvc_install.rc == 0 and db_mode == "shared"
       register: helm_install
     - debug:
         var: helm_install.stdout_lines
