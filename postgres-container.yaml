@@ -57,9 +57,9 @@
         --set volumePermissions.enabled=true
         --set primary.service.type=NodePort
       when: pv_pvc_install.rc == 0 and db_mode == "exclusive"
-      register: helm_install
+      register: helm_install_exclusive
     - debug:
-        var: helm_install.stdout_lines
+        var: helm_install_exclusive.stdout_lines
 
     - name: Deploy PostgreSQL Helm Chart in shared Mode
       command: >
@@ -71,18 +71,18 @@
         --set volumePermissions.enabled=true
         --set primary.service.type=NodePort
       when: pv_pvc_install.rc == 0 and db_mode == "shared"
-      register: helm_install
+      register: helm_install_shared
     - debug:
-        var: helm_install.stdout_lines
+        var: helm_install_shared.stdout_lines
         
     - name: Wait for all pods to be in a 'Running' state
       command: kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance={{ helm_release_name }} -n {{ helm_release_namespace }} --timeout=300s
-      when: helm_install.rc == 0
+      when: helm_install_exclusive.rc == 0 or helm_install_shared.rc == 0
 
     - name: Print Kubernetes objects created by the Helm chart
       command: kubectl get all -n {{ helm_release_namespace }} -l app.kubernetes.io/instance={{ helm_release_name }}
       register: k8s_objects
-      when: helm_install.rc == 0
+      when: helm_install_exclusive.rc == 0 or helm_install_shared.rc == 0
     - debug:
         var: k8s_objects.stdout_lines
       
@@ -148,7 +148,7 @@
             "password": "{{ password }}",
           }
         status_code: 200
-      when: cluster_port_result.stdout is defined
+      when: post_req_DB is defined
       register: post_req_user
     - debug:
         var: post_req_user
