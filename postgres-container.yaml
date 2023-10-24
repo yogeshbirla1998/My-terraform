@@ -9,8 +9,7 @@
     helm_release_name: "postgres-{{ ansible_date_time.epoch }}"
     helm_release_namespace: "{{ helm_release_namespace }}"
     db_name: "{{ db_name }}"
-    username: "{{ username }}"
-    postgres_password: "{{ password }}"
+    db_mode: "{{ db_mode }}"
     admin_username: "{{ admin_username }}"
     admin_password: "{{ admin_password }}"
     number_of_replicas: "{{ number_of_replicas }}"
@@ -105,8 +104,7 @@
             "port": "{{ global_cluster_port }}",
             "db_type": "{{ database }}",
             "db_name": "{{ db_name }}",
-            "username": "{{ username }}",
-            "password": "{{ password }}",
+            "db_mode": "{{ db_mode }}",
             "admin_username": "{{ admin_username }}",
             "admin_password": "{{ admin_password }}",
             "replica_count": "{{ number_of_replicas }}",
