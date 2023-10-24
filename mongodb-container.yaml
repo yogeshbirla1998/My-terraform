@@ -4,20 +4,20 @@
   vars:
     restIP: "{{ restIP }}"
     restPORT: "{{ restPORT }}"
-    helm_chart_name: bitnami/mongodb
+    helm_chart_name: "{{ helm_chart_name }}"
     helm_chart_version: "{{ helm_chart_version }}"
     helm_release_name: "mongodb-{{ ansible_date_time.epoch }}"
     helm_release_namespace: "{{ helm_release_namespace }}"
     db_name: "{{ db_name }}"
     username: "{{ username }}"
     password: "{{ password }}"
-    admin_username: root
+    admin_username: "{{ admin_username }}"
     admin_password: "{{ admin_password }}"
-    number_of_replicas: 1
+    number_of_replicas: "{{ number_of_replicas }}"
     size: "{{ size }}"
     database: "{{ database }}"
-    storageClass: local-hostpath-storage
-    accessMode: ReadWriteOnce
+    storageClass: "{{ storageClass }}"
+    accessMode: "{{ accessMode }}"
   tasks:
     - name: Check if Helm is installed
       command: helm version --short
