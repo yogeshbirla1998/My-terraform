@@ -12,6 +12,8 @@
     db_mode: "{{ db_mode }}"
     admin_username: "{{ admin_username }}"
     admin_password: "{{ admin_password }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
     number_of_replicas: "{{ number_of_replicas }}"
     size: "{{ size }}"
     database: "{{ database }}"
