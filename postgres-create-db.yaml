@@ -26,3 +26,21 @@
     - name: Print the create database result
       debug:
         var: result_create_db
+        
+    - name: Store database info 
+      uri:
+        url: "http://{{ restIP }}:{{ restPORT }}/platform/v1/database/saveDb"
+        method: POST
+        body_format: json
+        headers:
+          Content-Type: "application/json"
+        body: >
+          {
+            "serverName": "{{ serverName }}", 
+            "db_name": "{{ db_name }}"
+          }
+        status_code: 200
+      when: result_create_db is defined
+      register: post_req_DB
+    - debug:
+        var: post_req_DB
