@@ -1,0 +1,28 @@
+---
+- name: Create PostgreSQL Database, and Set Permissions
+  hosts: localhost
+  gather_facts: no
+
+  vars:
+    admin_username: "{{ admin_username }}"
+    admin_password: "{{ admin_password }}"
+    db_name: "{{ db_name }}"
+    postgres_ip: "{{ postgres_ip }}"
+    postgres_port: "{{ postgres_port }}"
+    
+  tasks:
+    - name: Install PostgreSQL client package
+      apt:
+        name: postgresql-client
+      become: yes
+
+    - name: Create PostgreSQL Database
+      shell: |
+        psql -h {{ postgres_ip }} -p {{ postgres_port }} -U {{ admin_username }} -c "CREATE DATABASE {{ db_name }};"
+      environment:
+        PGPASSWORD: "{{ admin_password }}"
+      register: result_create_db
+
+    - name: Print the create database result
+      debug:
+        var: result_create_db
