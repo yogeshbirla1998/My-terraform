@@ -4,20 +4,18 @@
   vars:
     restIP: "{{ restIP }}"
     restPORT: "{{ restPORT }}"
+    serverName: "{{ serverName }}"
+    serverMode: "{{ serverMode }}"
+    serverType: "{{ serverType }}"
     helm_chart_name: "{{ helm_chart_name }}"
     helm_chart_version: "{{ helm_chart_version }}"
-    helm_release_name: "postgres-{{ ansible_date_time.epoch }}"
+    helm_release_name: "{{ serverName }}"
     helm_release_namespace: "{{ helm_release_namespace }}"
-    db_name: "{{ db_name }}"
-    db_mode: "{{ db_mode }}"
-    db_type: "{{ db_type }}"
     admin_username: "{{ admin_username }}"
     admin_password: "{{ admin_password }}"
-    username: "{{ username }}"
-    password: "{{ password }}"
     number_of_replicas: "{{ number_of_replicas }}"
     size: "{{ size }}"
-    database: "{{ db_type }}"
+    database: "{{ serverType }}"
     storageClass: "{{ storageClass }}"
     accessMode: "{{ accessMode }}"
   tasks:
@@ -46,44 +44,27 @@
       command: kubectl apply -f pv-pvc.yaml
       register: pv_pvc_install
       
-    - name: Deploy PostgreSQL Helm Chart in exclusive Mode
+    - name: Deploy PostgreSQL Helm Chart 
       command: >
         helm install {{ helm_release_name }} {{ helm_chart_name }} -n {{ helm_release_namespace }}
         --set global.postgresql.auth.postgresPassword={{ admin_password }}
-        --set global.postgresql.auth.username={{ username }}
-        --set global.postgresql.auth.password={{ password }}
-        --set global.postgresql.auth.database={{ db_name }}
         --set readReplicas.replicaCount={{ number_of_replicas }}
         --set primary.persistence.existingClaim={{ helm_release_name }}-pvc
         --set volumePermissions.enabled=true
         --set primary.service.type=NodePort
-      when: pv_pvc_install.rc == 0 and db_mode == "exclusive"
-      register: helm_install_exclusive
+      when: pv_pvc_install.rc == 0 and serverMode == "exclusive"
+      register: helm_install
     - debug:
-        var: helm_install_exclusive.stdout_lines
-
-    - name: Deploy PostgreSQL Helm Chart in shared Mode
-      command: >
-        helm install {{ helm_release_name }} {{ helm_chart_name }} -n {{ helm_release_namespace }}
-        --set global.postgresql.auth.postgresPassword={{ admin_password }}
-        --set global.postgresql.auth.database={{ db_name }}
-        --set readReplicas.replicaCount={{ number_of_replicas }}
-        --set primary.persistence.existingClaim={{ helm_release_name }}-pvc
-        --set volumePermissions.enabled=true
-        --set primary.service.type=NodePort
-      when: pv_pvc_install.rc == 0 and db_mode == "shared"
-      register: helm_install_shared
-    - debug:
-        var: helm_install_shared.stdout_lines
+        var: helm_install.stdout_lines
         
     - name: Wait for all pods to be in a 'Running' state
       command: kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance={{ helm_release_name }} -n {{ helm_release_namespace }} --timeout=300s
-      when: helm_install_exclusive.rc == 0 or helm_install_shared.rc == 0
+      when: helm_install.rc == 0
 
     - name: Print Kubernetes objects created by the Helm chart
       command: kubectl get all -n {{ helm_release_namespace }} -l app.kubernetes.io/instance={{ helm_release_name }}
       register: k8s_objects
-      when: helm_install_exclusive.rc == 0 or helm_install_shared.rc == 0
+      when: helm_install.rc == 0
     - debug:
         var: k8s_objects.stdout_lines
       
@@ -106,22 +87,22 @@
 
     - name: Store database info 
       uri:
-        url: "http://{{ restIP }}:{{ restPORT }}/platform/v1/database/saveDB"
+        url: "http://{{ restIP }}:{{ restPORT }}/platform/v1/database/saveServer"
         method: POST
         body_format: json
         headers:
           Content-Type: "application/json"
         body: >
           {
+            "serverName": {{ serverName }},
+            "serverType": {{ serverType }},
+            "serverMode": {{ serverMode }},
             "chart_name": "{{ helm_chart_name }}",
             "chart_version": "{{ helm_chart_version }}",
             "release_name": "{{ helm_release_name }}",
             "release_namespace": "{{ helm_release_namespace }}",
             "ip": "{{ global_cluster_ip }}",
             "port": "{{ global_cluster_port }}",
-            "db_type": "{{ db_type }}",
-            "db_name": "{{ db_name }}",
-            "db_mode": "{{ db_mode }}",
             "admin_username": "{{ admin_username }}",
             "admin_password": "{{ admin_password }}",
             "replica_count": "{{ number_of_replicas }}",
@@ -132,25 +113,4 @@
       register: post_req_DB
     - debug:
         var: post_req_DB
-
-    - name: Store user's info 
-      uri:
-        url: "http://{{ restIP }}:{{ restPORT }}/platform/v1/database/saveUser"
-        method: POST
-        body_format: json
-        headers:
-          Content-Type: "application/json"
-        body: >
-          {
-            "db_name": "{{ db_name }}",
-            "db_type": "{{ db_type }}",
-            "db_mode": "{{ db_mode }}",
-            "username": "{{ username }}",
-            "password": "{{ password }}",
-          }
-        status_code: 200
-      when: post_req_DB is defined
-      register: post_req_user
-    - debug:
-        var: post_req_user
 
