@@ -1,0 +1,48 @@
+---
+- name: Add PostgreSQL users and set permissions
+  hosts: localhost
+  gather_facts: no
+
+  vars:
+    admin_username: "{{ admin_username }}"
+    admin_password: "{{ admin_password }}"
+    db_name: "{{ db_name }}"
+    postgres_ip: "{{ postgres_ip }}"
+    postgres_port: "{{ postgres_port }}"
+    users_and_permissions:
+      - name: "{{ username }}"
+        password: "{{ password }}"
+        permissions:
+          - schema: "schema_{{ username }}.{{ table_name }}"
+            type: "{{ permission_type }}"
+  tasks:
+    - name: Install PostgreSQL client package
+      apt:
+        name: postgresql-client
+      become: yes
+
+    - name: Create PostgreSQL users
+      shell: |
+        psql -h postgres_ip -p postgres_port -U {{ admin_username }} -d {{ db_name }} -c "CREATE USER {{ item.name }} WITH PASSWORD '{{ item.password }}';"
+      with_items: "{{ users_and_permissions }}"
+      environment:
+        PGPASSWORD: "{{ admin_password }}"
+      ignore_errors: yes
+      register: result_create_user
+
+    - name: Set PostgreSQL user permissions
+      shell: |
+        psql -h postgres_ip -p postgres_port -U {{ admin_username }} -d {{ db_name }} -c "GRANT {{ item.permissions.type }} ON {{ item.permissions.name }} TO {{ item.name }};"
+      with_items: "{{ users_and_permissions }}"
+      environment:
+        PGPASSWORD: "{{ admin_password }}"
+      ignore_errors: yes
+      register: result_set_permissions
+
+    - name: Print the create user result
+      debug:
+        var: result_create_user
+
+    - name: Print the set permissions result
+      debug:
+        var: result_set_permissions
