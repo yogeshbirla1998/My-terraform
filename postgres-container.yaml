@@ -94,9 +94,9 @@
           Content-Type: "application/json"
         body: >
           {
-            "serverName": {{ serverName }},
-            "serverType": {{ serverType }},
-            "serverMode": {{ serverMode }},
+            "serverName": "{{ serverName }}",
+            "serverType": "{{ serverType }}",
+            "serverMode": "{{ serverMode }}",
             "chart_name": "{{ helm_chart_name }}",
             "chart_version": "{{ helm_chart_version }}",
             "release_name": "{{ helm_release_name }}",
