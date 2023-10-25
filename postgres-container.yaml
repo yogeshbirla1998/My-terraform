@@ -9,7 +9,7 @@
     serverType: "{{ serverType }}"
     helm_chart_name: "{{ helm_chart_name }}"
     helm_chart_version: "{{ helm_chart_version }}"
-    helm_release_name: "{{ serverName }}"
+    helm_release_name: "{{ serverName }}-{{ ansible_date_time.epoch }}"
     helm_release_namespace: "{{ helm_release_namespace }}"
     admin_username: "{{ admin_username }}"
     admin_password: "{{ admin_password }}"
