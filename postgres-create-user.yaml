@@ -11,12 +11,10 @@
     db_name: "{{ db_name }}"
     postgres_ip: "{{ postgres_ip }}"
     postgres_port: "{{ postgres_port }}"
-    users_and_permissions:
-      - name: "{{ username }}"
-        password: "{{ password }}"
-        permissions:
-          - schema: "schema_{{ username }}.*"
-            type: "{{ priviledges }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    schema: "schema_{{ username }}.*"
+    priviledges: "{{ priviledges }}"
   tasks:
     - name: Install PostgreSQL client package
       apt:
@@ -25,8 +23,7 @@
 
     - name: Create PostgreSQL users
       shell: |
-        psql -h {{ postgres_ip }} -p {{ postgres_port }} -U {{ admin_username }} -d {{ db_name }} -c "CREATE USER {{ item.name }} WITH PASSWORD '{{ item.password }}';"
-      loop: "{{ users_and_permissions }}"
+        psql -h {{ postgres_ip }} -p {{ postgres_port }} -U {{ admin_username }} -d {{ db_name }} -c "CREATE USER {{ username }} WITH PASSWORD '{{ password }}';"
       environment:
         PGPASSWORD: "{{ admin_password }}"
       ignore_errors: yes
@@ -34,13 +31,11 @@
 
     - name: Set PostgreSQL user permissions
       shell: |
-        psql -h {{ postgres_ip }} -p {{ postgres_port }} -U {{ admin_username }} -d {{ db_name }} -c "GRANT {{ item.permissions[0].type }} ON {{ item.permissions[0].schema }} TO {{ item.name }};"
-      loop: "{{ users_and_permissions }}"
+        psql -h {{ postgres_ip }} -p {{ postgres_port }} -U {{ admin_username }} -d {{ db_name }} -c "GRANT {{ priviledges }} ON {{ schema }} TO {{ username }};"
       environment:
         PGPASSWORD: "{{ admin_password }}"
       ignore_errors: yes
       register: result_set_permissions
-      when: result_create_user.results | length > 0
 
     - name: Print the create user result
       debug:
@@ -65,7 +60,7 @@
             "db_name": "{{ db_name }}",
             "priviledges": "{{ priviledges }}"
           }
-      when: result_set_permissions.results | length > 0
+      when: result_set_permissions.rc == 0
       register: post_req_User
 
     - debug:
