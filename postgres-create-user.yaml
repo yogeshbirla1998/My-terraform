@@ -33,12 +33,12 @@
       shell: |
         psql -h {{ postgres_ip }} -p {{ postgres_port }} -U {{ admin_username }} -d {{ db_name }} -c "
         ALTER DEFAULT PRIVILEGES FOR ROLE {{ username }} IN SCHEMA public
-        GRANT {{ priviledges }} ON TABLES TO {{ username }};
+        GRANT ALL ON TABLES TO {{ username }};
         GRANT CONNECT ON DATABASE {{ db_name }} TO {{ username }};
+        GRANT {{ priviledges }} ON DATABASE {{ db_name }} TO {{ username }};
         ALTER ROLE {{ username }} WITH LOGIN;"
       environment:
         PGPASSWORD: "{{ admin_password }}"
-      ignore_errors: yes
       register: result_set_permissions
       
     - name: Print the create user result
@@ -62,7 +62,8 @@
             "username": "{{ username }}",
             "password": "{{ password }}",
             "db_name": "{{ db_name }}",
-            "priviledges": "LOGIN,CONNECT,{{ priviledges }}"
+            "priviledges_db": "LOGIN,CONNECT,{{ priviledges }}",
+            "priviledges_tables": "ALL"
           }
       when: result_set_permissions.rc == 0
       register: post_req_User
