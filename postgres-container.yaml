@@ -128,9 +128,9 @@
             "priviledges": "*"
           }
         status_code: 200
-      when: cluster_port_result.stdout is defined
-      register: post_req_DB
+      when: post_req_DB is defined
+      register: post_req_User
     - debug:
-        var: post_req_DB
+        var: post_req_User
 
 
