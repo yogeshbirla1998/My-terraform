@@ -15,6 +15,7 @@
     password: "{{ password }}"
     schema: "schema_{{ username }}.*"
     priviledges_db: "{{ priviledges_db }}"
+    priviledges_tables: "{{ priviledges_tables }}"
   tasks:
     - name: Install PostgreSQL client package
       apt:
@@ -33,8 +34,7 @@
       shell: |
         psql -h {{ postgres_ip }} -p {{ postgres_port }} -U {{ admin_username }} -d {{ db_name }} -c "
         ALTER DEFAULT PRIVILEGES FOR ROLE {{ username }} IN SCHEMA public
-        GRANT ALL ON TABLES TO {{ username }};
-        GRANT CONNECT ON DATABASE {{ db_name }} TO {{ username }};
+        GRANT {{ priviledges_tables }} ON TABLES TO {{ username }};
         GRANT {{ priviledges_db }} ON DATABASE {{ db_name }} TO {{ username }};
         ALTER ROLE {{ username }} WITH LOGIN;"
       environment:
@@ -62,8 +62,8 @@
             "username": "{{ username }}",
             "password": "{{ password }}",
             "db_name": "{{ db_name }}",
-            "priviledges_db": "LOGIN,CONNECT,{{ priviledges_db }}",
-            "priviledges_tables": "ALL"
+            "priviledges_db": "LOGIN,{{ priviledges_db }}",
+            "priviledges_tables": "{{ priviledges_tables }}"
           }
       when: result_set_permissions.rc == 0
       register: post_req_User
