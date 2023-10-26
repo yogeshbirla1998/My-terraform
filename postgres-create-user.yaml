@@ -4,6 +4,8 @@
   gather_facts: no
 
   vars:
+    restIP: "{{ restIP }}"
+    restPORT: "{{ restPORT }}"
     serverName: "{{ serverName }}"
     admin_username: "{{ admin_username }}"
     admin_password: "{{ admin_password }}"
