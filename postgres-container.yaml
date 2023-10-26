@@ -125,8 +125,9 @@
             "serverName": "{{ serverName }}",
             "username": "{{ admin_username }}",
             "password": "{{ admin_password }}",
-            "db_name": "*",
-            "priviledges": "*"
+            "db_name": "ALL",
+            "priviledges_db": "ALL",
+            "priviledges_tables": "ALL"
           }
         status_code: 200
       when: post_req_DB is defined
