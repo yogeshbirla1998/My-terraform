@@ -35,7 +35,7 @@
 
     - name: Set PostgreSQL user permissions
       shell: |
-        psql -h postgres_ip -p postgres_port -U {{ admin_username }} -d {{ db_name }} -c "GRANT {{ item.permissions.type }} ON {{ item.permissions.name }} TO {{ item.name }};"
+        psql -h {{ postgres_ip }} -p {{ postgres_port }} -U {{ admin_username }} -d {{ db_name }} -c "GRANT {{ item.permissions[0].type }} ON {{ item.permissions[0].schema }} TO {{ item.name }};"
       with_items: "{{ users_and_permissions }}"
       environment:
         PGPASSWORD: "{{ admin_password }}"
