@@ -62,7 +62,7 @@
             "username": "{{ username }}",
             "password": "{{ password }}",
             "db_name": "{{ db_name }}",
-            "priviledges": "{{ priviledges }}"
+            "priviledges": "LOGIN,CONNECT,{{ priviledges }}"
           }
       when: result_set_permissions.rc == 0
       register: post_req_User
