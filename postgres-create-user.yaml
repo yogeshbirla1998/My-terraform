@@ -26,7 +26,7 @@
 
     - name: Create PostgreSQL users
       shell: |
-        psql -h postgres_ip -p postgres_port -U {{ admin_username }} -d {{ db_name }} -c "CREATE USER {{ item.name }} WITH PASSWORD '{{ item.password }}';"
+        psql -h {{ postgres_ip }} -p {{ postgres_port }} -U {{ admin_username }} -d {{ db_name }} -c "CREATE USER {{ item.name }} WITH PASSWORD '{{ item.password }}';"
       with_items: "{{ users_and_permissions }}"
       environment:
         PGPASSWORD: "{{ admin_password }}"
@@ -41,6 +41,7 @@
         PGPASSWORD: "{{ admin_password }}"
       ignore_errors: yes
       register: result_set_permissions
+      when: result_create_user.rc == 0
 
     - name: Print the create user result
       debug:
@@ -67,7 +68,7 @@
             "priviledges": "{{ priviledges }}"
           }
         status_code: 200
-      when: result_set_permissions is defined
+      when: result_set_permissions.rc == 0
       register: post_req_User
     - debug:
         var: post_req_User
