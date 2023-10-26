@@ -23,7 +23,7 @@
 
     - name: Create PostgreSQL users
       shell: |
-        psql -h {{ postgres_ip }} -p {{ postgres_port }} -U {{ admin_username }} -d {{ db_name }} -c "CREATE USER {{ username }} WITH PASSWORD '{{ password }}';"
+        psql -h {{ postgres_ip }} -p {{ postgres_port }} -U {{ admin_username }} -d {{ db_name }} -c "CREATE ROLE {{ username }} WITH LOGIN PASSWORD '{{ password }}';"
       environment:
         PGPASSWORD: "{{ admin_password }}"
       ignore_errors: yes
@@ -31,12 +31,16 @@
 
     - name: Set PostgreSQL user permissions
       shell: |
-        psql -h {{ postgres_ip }} -p {{ postgres_port }} -U {{ admin_username }} -d {{ db_name }} -c "GRANT {{ priviledges }} ON DATABASE {{ db_name }} TO {{ username }};"
+        psql -h {{ postgres_ip }} -p {{ postgres_port }} -U {{ admin_username }} -d {{ db_name }} -c "
+        ALTER DEFAULT PRIVILEGES FOR ROLE {{ username }} IN SCHEMA public
+        GRANT {{ priviledges }} ON TABLES TO {{ username }};
+        GRANT CONNECT ON DATABASE {{ db_name }} TO {{ username }};
+        ALTER ROLE {{ username }} WITH LOGIN;"
       environment:
         PGPASSWORD: "{{ admin_password }}"
       ignore_errors: yes
       register: result_set_permissions
-
+      
     - name: Print the create user result
       debug:
         var: result_create_user
