@@ -37,7 +37,8 @@
         body: >
           {
             "serverName": "{{ serverName }}", 
-            "db_name": "{{ db_name }}"
+            "db_name": "{{ db_name }}",
+            "number_users": 0
           }
         status_code: 200
       when: result_create_db is defined
