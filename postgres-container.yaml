@@ -104,7 +104,6 @@
             "ip": "{{ global_cluster_ip }}",
             "port": "{{ global_cluster_port }}",
             "admin_username": "{{ admin_username }}",
-            "admin_password": "{{ admin_password }}",
             "replica_count": "{{ number_of_replicas }}",
             "storage_size": "{{ size }}"
           }
@@ -113,4 +112,26 @@
       register: post_req_DB
     - debug:
         var: post_req_DB
+
+    - name: Store Admin user info 
+      uri:
+        url: "http://{{ restIP }}:{{ restPORT }}/platform/v1/database/saveUser"
+        method: POST
+        body_format: json
+        headers:
+          Content-Type: "application/json"
+        body: >
+          {
+            "serverName": "{{ serverName }}",
+            "username": "{{ admin_username }}",
+            "password": "{{ admin_password }}",
+            "admin_username": "{{ admin_username }}",
+            "priviledges": "*"
+          }
+        status_code: 200
+      when: cluster_port_result.stdout is defined
+      register: post_req_DB
+    - debug:
+        var: post_req_DB
+
 
