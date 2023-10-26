@@ -125,6 +125,7 @@
             "serverName": "{{ serverName }}",
             "username": "{{ admin_username }}",
             "password": "{{ admin_password }}",
+            "db_name": "*",
             "priviledges": "*"
           }
         status_code: 200
