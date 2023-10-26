@@ -52,7 +52,7 @@
         --set primary.persistence.existingClaim={{ helm_release_name }}-pvc
         --set volumePermissions.enabled=true
         --set primary.service.type=NodePort
-      when: pv_pvc_install.rc == 0 and serverMode == "exclusive"
+      when: pv_pvc_install.rc == 0
       register: helm_install
     - debug:
         var: helm_install.stdout_lines
