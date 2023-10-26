@@ -4,6 +4,7 @@
   gather_facts: no
 
   vars:
+    serverName: "{{ serverName }}"
     admin_username: "{{ admin_username }}"
     admin_password: "{{ admin_password }}"
     db_name: "{{ db_name }}"
@@ -13,8 +14,8 @@
       - name: "{{ username }}"
         password: "{{ password }}"
         permissions:
-          - schema: "schema_{{ username }}.{{ table_name }}"
-            type: "{{ permission_type }}"
+          - schema: "schema_{{ username }}.*"
+            type: "{{ priviledges }}"
   tasks:
     - name: Install PostgreSQL client package
       apt:
@@ -46,3 +47,25 @@
     - name: Print the set permissions result
       debug:
         var: result_set_permissions
+
+        
+    - name: Store database info 
+      uri:
+        url: "http://{{ restIP }}:{{ restPORT }}/platform/v1/database/saveUser"
+        method: POST
+        body_format: json
+        headers:
+          Content-Type: "application/json"
+        body: >
+          {
+            "serverName": "{{ serverName }}",
+            "username": "{{ username }}",
+            "password": "{{ password }}",
+            "db_name": "{{ db_name }}",
+            "priviledges": "{{ priviledges }}"
+          }
+        status_code: 200
+      when: result_set_permissions is defined
+      register: post_req_User
+    - debug:
+        var: post_req_User
